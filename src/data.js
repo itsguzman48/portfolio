@@ -122,4 +122,34 @@ export const trayectoria = [
   { a: '2020', t: 'Atención al cliente · Vodafone', d: 'Soporte técnico telefónico' },
 ];
 
-export const idiomas = 'Español nativo · Inglés intermedio-alto · Euskera intermedio';
+// Bloques de «Sobre mí». Cada frase resume un dato que ya está en `proyectos`
+// (detalle, cifra o stack). Cada herramienta tiene que aparecer tal cual en
+// algún `proyectos[].stack`: la página lo comprueba al construir.
+export const foco = [
+  {
+    t: 'Sistemas',
+    d: 'Cowrie en DigitalOcean, análisis en Azure, unidos por WireGuard.',
+    tools: ['DigitalOcean', 'Azure', 'WireGuard'],
+  },
+  {
+    t: 'Datos',
+    d: '332.776 registros horarios de 8 estaciones.',
+    tools: ['Python', 'InfluxDB', 'Grafana'],
+  },
+  {
+    t: 'Modelos',
+    d: 'XGBoost con SHAP. Llama 3.1 clasifica los comandos.',
+    tools: ['XGBoost', 'SHAP', 'Llama 3.1'],
+  },
+  {
+    t: 'Web',
+    d: 'Planetario en HTML5 Canvas. LUXAI en Astro.',
+    tools: ['JavaScript', 'Astro', 'TypeScript'],
+  },
+];
+
+export const idiomas = [
+  { nombre: 'Español', nivel: 'nativo' },
+  { nombre: 'Inglés', nivel: 'intermedio-alto' },
+  { nombre: 'Euskera', nivel: 'intermedio' },
+];
