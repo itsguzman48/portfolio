@@ -1,0 +1,191 @@
+---
+import '@fontsource/im-fell-english-sc/400.css';
+import '@fontsource/im-fell-english/400-italic.css';
+import '@fontsource-variable/eb-garamond/wght.css';
+import '@fontsource-variable/eb-garamond/wght-italic.css';
+import '../styles/global.css';
+import { Image } from 'astro:assets';
+import Toc from '../components/Toc.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Chapter from '../components/Chapter.astro';
+import { contacto, proyectos, experiencia, formacion, herramientas, idiomas } from '../data.js';
+import mapa_ataques from '../assets/mapa_ataques.png';
+import arquitectura_haizelab from '../assets/arquitectura_haizelab.png';
+import shap_summary_beeswarm from '../assets/shap_summary_beeswarm.png';
+import celestial from '../assets/celestial.png';
+import luxai from '../assets/luxai.png';
+const imgs = { mapa_ataques, arquitectura_haizelab, shap_summary_beeswarm, celestial };
+const desc = 'Íñigo Guzmán. Técnico Superior ASIR especializándose en IA y Big Data. Sistemas, cloud, pipelines de datos e IA aplicada a infraestructura real. Getxo, Bizkaia.';
+---
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Íñigo Guzmán · Sistemas, cloud, datos e IA</title>
+  <meta name="description" content={desc} />
+  <meta property="og:title" content="Íñigo Guzmán" />
+  <meta property="og:description" content={desc} />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#e4e1d5" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <script is:inline>
+    try { const t = localStorage.getItem('papel'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+
+  <header class="cover">
+    <p class="folio" aria-hidden="true">·</p>
+    <h1 class="name"><span>Íñigo</span><span>Guzmán</span></h1>
+    <p class="subtitle">Sistemas, cloud, datos <em>&amp;</em> IA</p>
+    <p class="lede">Vengo de administrar servidores y ahora me estoy especializando en IA y Big Data. Lo que me interesa es la parte que suele quedarse fuera de las demos: llevar los modelos y los datos a una infraestructura que funcione de verdad.</p>
+    <Toc />
+    <div class="edition">
+      <span>ed. MMXXVI · {contacto.lugar}</span>
+      <ThemeToggle />
+    </div>
+  </header>
+
+  <div class="running" aria-hidden="true" data-running>
+    <a href="#" tabindex="-1">Íñigo Guzmán</a>
+    <span data-running-ch></span>
+  </div>
+
+  <main id="contenido">
+    <Chapter id="sobre-mi" n="I" title="Sobre mí">
+      <div class="prose">
+        <p class="dropcap">Soy técnico superior en Administración de Sistemas Informáticos en Red por el CIFP Somorrostro, y este curso hago allí la especialización en Inteligencia Artificial y Big Data. Mi base es la de un sysadmin: Linux, Windows Server, redes, scripting.</p>
+        <p>En 2026 pasé tres meses de Erasmus en Cosenza, en Italia, como técnico de sistemas en Internet-Idee, entre servidores, máquinas virtuales y soporte. Antes, en 2020, estuve al teléfono en atención técnica para Vodafone, que es donde se aprende a resolver una incidencia con alguien nervioso al otro lado.</p>
+        <p>Casi todo lo que hago acaba teniendo la misma forma: algo que recoge datos, algo que los guarda bien, un modelo que saca una conclusión y un panel donde alguien la puede leer. Me gusta que las cifras sean honestas, aunque salgan menos espectaculares.</p>
+        <p>Fuera de la pantalla edito vídeo y vuelo dron. Tengo carné B, coche propio y ganas de moverme.</p>
+      </div>
+      <figure class="pull">
+        <blockquote><p>“La conclusión es un efecto confirmado pero moderado: algo más de la mitad de la bajada observada en el centro se habría producido igualmente.”</p></blockquote>
+        <figcaption>— Del informe de HaizeLab</figcaption>
+      </figure>
+    </Chapter>
+
+    <Chapter id="proyectos" n="II" title="Proyectos">
+      <p class="intro">Cuatro trabajos de 2026, de la red a la estadística. Todos tienen el código abierto en GitHub.</p>
+      <ol class="works">
+        {proyectos.map((p, i) => (
+          <li class="work" id={p.id}>
+            <a class="plate" href={p.enlaces[0].u} target="_blank" rel="noopener" aria-label={`${p.titulo}: ${p.enlaces[0].t}`}>
+              <Image src={imgs[p.img]} alt={p.alt} widths={[640, 960, 1280]} sizes="(max-width: 760px) 92vw, 720px" loading={i === 0 ? 'eager' : 'lazy'} />
+            </a>
+            <div class="caption">
+              <h3>{p.titulo}</h3>
+              <span>{p.meta}</span>
+            </div>
+            <p class="figure"><strong>{p.cifra}</strong> <span>{p.cifraTexto}</span></p>
+            <p class="work-text">{p.texto}</p>
+            <p class="stack"><em>{p.stack}</em></p>
+            <p class="links">{p.enlaces.map((e) => <a href={e.u} target="_blank" rel="noopener">{e.t} ↗</a>)}</p>
+          </li>
+        ))}
+      </ol>
+    </Chapter>
+
+    <Chapter id="luxai" n="III" title="LUXAI">
+      <p class="intro">Mi proyecto emprendedor. Va de otra cosa, pero con las mismas manías.</p>
+      <a class="plate plate-wide" href="https://luxaivideo.com" target="_blank" rel="noopener" aria-label="Visitar luxaivideo.com">
+        <Image src={luxai} alt="Portada de luxaivideo.com: una villa al atardecer con el titular «Vuestras fotos ya tienen una película dentro»." widths={[640, 960, 1440]} sizes="(max-width: 860px) 94vw, 820px" />
+      </a>
+      <div class="caption"><h3>LUXAI Video</h3><a href="https://luxaivideo.com" target="_blank" rel="noopener">luxaivideo.com ↗</a></div>
+      <div class="prose">
+        <p>LUXAI convierte las fotos de villas y alquileres de lujo en vídeos de estilo aéreo, como grabados con dron, pero generados con IA (Google Flow). Sin rodaje, sin dron y sin permisos de vuelo: el cliente manda entre 5 y 15 fotos y en 72 horas tiene sus vídeos para portales, web y redes.</p>
+        <p>La web también es mía: multipágina, en español e inglés, hecha con Astro y TypeScript, con su auditoría de SEO, informes de Lighthouse y un documento donde apunto cada decisión de diseño con su motivo.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>De las fotos al vídeo</dt><dd>72 h</dd></div>
+        <div><dt>Fotos de partida</dt><dd>5–15</dd></div>
+        <div><dt>Formatos</dt><dd>16:9 · 9:16</dd></div>
+        <div><dt>Web</dt><dd>Astro + TS, ES/EN</dd></div>
+      </dl>
+    </Chapter>
+
+    <Chapter id="trayectoria" n="IV" title="Trayectoria">
+      <h3 class="list-h">Experiencia</h3>
+      <ul class="ledger">
+        {experiencia.map((e) => <li><div><span class="l-t">{e.t}</span><span class="l-d">{e.d}</span></div><span class="l-a">{e.a}</span></li>)}
+      </ul>
+      <h3 class="list-h">Formación</h3>
+      <ul class="ledger">
+        {formacion.map((e) => <li><div><span class="l-t">{e.t}</span><span class="l-d">{e.d}</span></div><span class="l-a">{e.a}</span></li>)}
+      </ul>
+    </Chapter>
+
+    <Chapter id="herramientas" n="V" title="Herramientas">
+      <div class="tools">
+        {herramientas.map((h) => (
+          <div><h3 class="list-h">{h.g}</h3><p class="tool-list">{h.l.join(', ')}.</p></div>
+        ))}
+      </div>
+      <h3 class="list-h">Idiomas</h3>
+      <ul class="ledger compact">
+        {idiomas.map((e) => <li><div><span class="l-t">{e.t}</span></div><span class="l-a">{e.a}</span></li>)}
+      </ul>
+      <h3 class="list-h">Además</h3>
+      <p class="tool-list">Edición audiovisual y dron propio. Carné B, coche propio y disponibilidad para viajar.</p>
+    </Chapter>
+
+    <Chapter id="contacto" n="VI" title="Contacto">
+      <div class="prose center">
+        <p>Tengo disponibilidad para la FP Dual intensiva (diciembre de 2026 / febrero de 2027). Si tienes servidores, datos o un modelo que hay que poner a funcionar, escríbeme.</p>
+      </div>
+      <p class="mail"><a href={`mailto:${contacto.email}`}>{contacto.email}</a></p>
+      <p class="clock" data-clock hidden>En Getxo son las <span></span>.</p>
+    </Chapter>
+  </main>
+
+  <footer class="foot">
+    <p class="foot-links">
+      <a href={`mailto:${contacto.email}`}>Email</a>
+      <a href={contacto.github} target="_blank" rel="noopener">GitHub</a>
+      <a href={contacto.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+      <a href="/cv.pdf" download="CV-Inigo-Guzman.pdf">CV</a>
+    </p>
+    <Toc label="Índice (pie)" />
+    <div class="edition">
+      <span>ed. MMXXVI · Íñigo Guzmán</span>
+      <ThemeToggle />
+    </div>
+  </footer>
+
+  <script>
+    const root = document.documentElement;
+    document.querySelectorAll('[data-theme-toggle]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const dark = (root.dataset.theme ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro')) === 'oscuro';
+        root.dataset.theme = dark ? 'claro' : 'oscuro';
+        try { localStorage.setItem('papel', root.dataset.theme); } catch (e) {}
+      })
+    );
+    const clock = document.querySelector<HTMLElement>('[data-clock]');
+    if (clock) {
+      const span = clock.querySelector('span')!;
+      const tick = () => (span.textContent = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' }).format(new Date()));
+      tick(); clock.hidden = false; setInterval(tick, 30000);
+    }
+    const running = document.querySelector<HTMLElement>('[data-running]');
+    const chLabel = document.querySelector<HTMLElement>('[data-running-ch]');
+    const cover = document.querySelector('.cover');
+    if (running && chLabel && cover && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => running.classList.toggle('show', !e.isIntersecting), { threshold: 0.05 }).observe(cover);
+      const chIo = new IntersectionObserver((es) => es.forEach((e) => {
+        if (e.isIntersecting) {
+          const n = e.target.querySelector('.chapter-n')?.textContent ?? '';
+          const t = e.target.querySelector('.chapter-h')?.textContent ?? '';
+          chLabel.textContent = `${t} · ${n}`;
+        }
+      }), { rootMargin: '-45% 0px -50% 0px' });
+      document.querySelectorAll('.chapter').forEach((c) => chIo.observe(c));
+    }
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+      document.querySelectorAll('.chapter, .work').forEach((el) => { el.classList.add('rise'); io.observe(el); });
+    }
+  </script>
+</body>
+</html>

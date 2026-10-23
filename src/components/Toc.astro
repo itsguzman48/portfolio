@@ -1,0 +1,19 @@
+---
+const items = [
+  ['Sobre mí', '#sobre-mi', 'I'],
+  ['Proyectos', '#proyectos', 'II'],
+  ['LUXAI', '#luxai', 'III'],
+  ['Trayectoria', '#trayectoria', 'IV'],
+  ['Herramientas', '#herramientas', 'V'],
+  ['Contacto', '#contacto', 'VI'],
+];
+const { label = 'Índice' } = Astro.props;
+---
+<nav class="toc" aria-label={label}>
+  <ol>
+    {items.map(([t, h, n]) => (
+      <li><a href={h}><span class="toc-t">{t}</span><span class="toc-dots" aria-hidden="true"></span><span class="toc-n">{n}</span></a></li>
+    ))}
+    <li><a href="/cv.pdf" download="CV-Inigo-Guzman.pdf"><span class="toc-t">Currículum, en PDF</span><span class="toc-dots" aria-hidden="true"></span><span class="toc-n">↓</span></a></li>
+  </ol>
+</nav>
