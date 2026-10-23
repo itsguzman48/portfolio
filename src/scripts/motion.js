@@ -1,4 +1,9 @@
-// Apila las fichas con el scroll y gira portada/reverso. Sin librería.
+// Apila las fichas y suaviza la rueda.
+// Medido en cydstumpel.nl (oct 2026, rueda de 900px):
+// el scroll no salta; se asienta en 1s con 1 - 2^(-10t)
+// (117px a 16ms, 549 a 122ms, 820 a 341ms, 900 a 1s).
+// No hay scroll-snap. El nombre queda fijo y el bloque siguiente lo tapa.
+// El giro de ficha es transform 1s cubic-bezier(.25, 1, .5, 1).
 const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function syncFlip(flip, on) {
@@ -92,10 +97,17 @@ export function start() {
   const driftFallback = !reduce() && !CSS.supports('animation-timeline', 'scroll()');
   const track = document.querySelector('.hero-track');
   const rail = [...document.querySelectorAll('.rail a')];
+  const mast = document.querySelector('.mast');
+  const stage = document.querySelector('.stage');
 
   const layout = () => {
     const vh = window.innerHeight || 1;
     const calm = reduce();
+    if (mast && stage) {
+      const bar = document.querySelector('.bar');
+      const limit = (bar ? bar.getBoundingClientRect().height : 54) + 1;
+      mast.classList.toggle('is-covered', stage.getBoundingClientRect().top <= limit);
+    }
     sheets.forEach((sheet, index) => {
       const plate = sheet.querySelector('.plate');
       const next = sheets[index + 1];
@@ -105,9 +117,9 @@ export function start() {
         plate.style.setProperty('--stack', '0');
         return;
       }
-      const p = Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh));
-      plate.style.transform = `scale(${(1 - p * 0.1).toFixed(4)})`;
-      plate.style.setProperty('--stack', p.toFixed(4));
+      const raw = Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh));
+      plate.style.transform = `scale(${(1 - raw * 0.08).toFixed(4)})`;
+      plate.style.setProperty('--stack', raw.toFixed(4));
     });
 
     if (driftFallback && track) {
@@ -143,9 +155,107 @@ export function start() {
     });
   };
 
+  smoothWheel();
+
   layout();
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
   window.addEventListener('hashchange', openHash);
   openHash();
+}
+
+// Cada evento de rueda reinicia un segundo desde la posición actual
+// hacia el nuevo destino. La curva es la misma que usa Cyd en Lenis.
+function smoothWheel() {
+  const duration = 1000;
+  const ease = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+  let current = window.scrollY;
+  let target = current;
+  let from = current;
+  let to = current;
+  let started = 0;
+  let running = false;
+  let fromUs = false;
+  let frame = 0;
+
+  const limit = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const pixels = (dy, mode) => {
+    if (mode === 1) return dy * 16;
+    if (mode === 2) return dy * window.innerHeight;
+    return dy;
+  };
+
+  const tick = (now) => {
+    const t = Math.min(1, (now - started) / duration);
+    current = from + (to - from) * ease(t);
+    fromUs = true;
+    window.scrollTo(0, current);
+    fromUs = false;
+    if (t < 1) frame = requestAnimationFrame(tick);
+    else {
+      running = false;
+      current = to;
+    }
+  };
+
+  const go = (next) => {
+    target = Math.max(0, Math.min(limit(), next));
+    from = current;
+    to = target;
+    started = performance.now();
+    if (!running) {
+      running = true;
+      frame = requestAnimationFrame(tick);
+    }
+  };
+
+  const stop = () => {
+    running = false;
+    cancelAnimationFrame(frame);
+    current = target = window.scrollY;
+  };
+
+  if (!reduce()) {
+    window.addEventListener('wheel', (event) => {
+      if (event.ctrlKey) return;
+      if (document.querySelector('dialog[open]')) return;
+      const scroller = event.target.closest?.('.face');
+      if (scroller && scroller.scrollHeight > scroller.clientHeight + 2) {
+        const top = scroller.scrollTop <= 0;
+        const bottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+        if (!(top && event.deltaY < 0) && !(bottom && event.deltaY > 0)) return;
+      }
+      event.preventDefault();
+      go(target + pixels(event.deltaY, event.deltaMode));
+    }, { passive: false });
+  }
+
+  window.addEventListener('scroll', () => {
+    if (fromUs || running) return;
+    current = target = window.scrollY;
+  }, { passive: true });
+
+  window.addEventListener('keydown', (event) => {
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key)) stop();
+  });
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href^="#"]');
+    if (!link || reduce()) return;
+    const id = decodeURIComponent(link.getAttribute('href').slice(1));
+    const el = id ? document.getElementById(id) : null;
+    if (!el) return;
+    event.preventDefault();
+    let y = 0;
+    let node = el;
+    while (node) {
+      y += node.offsetTop;
+      node = node.offsetParent;
+    }
+    go(y);
+    history.pushState(null, '', `#${id}`);
+    openHash();
+  });
+
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', stop);
 }

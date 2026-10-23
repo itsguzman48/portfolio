@@ -148,12 +148,10 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
     </section>
 
     <section id="proyectos" aria-labelledby="proy-t">
-      <header class="sec-head">
-        <h2 id="proy-t">Trabajo</h2>
-      </header>
+      <h2 id="proy-t" class="sr-only">Trabajo</h2>
       <div class="stack">
         {proyectos.map((p, i) => (
-          <article class="sheet" id={p.id} data-sheet style={`--z:${i + 1}`}>
+          <article class="sheet" id={p.id} data-sheet style={`--z:${i + 2}`}>
             <h3 class="sr-only" id={`${p.id}-t`}>{p.nombre}</h3>
             <div class="plate">
               <div class="flip" data-flip data-name={p.nombre} aria-labelledby={`${p.id}-t`}>
