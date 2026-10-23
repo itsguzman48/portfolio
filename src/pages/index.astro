@@ -1,8 +1,10 @@
 ---
-import '@fontsource/gloock/400.css';
-import '@fontsource-variable/sora/wght.css';
+import '@fontsource/big-shoulders-display/700';
+import '@fontsource/big-shoulders-display/800';
+import '@fontsource/literata/400.css';
+import '@fontsource/literata/600.css';
 import '../styles/global.css';
-import { Image, getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import { contacto, proyectos, trayectoria, idiomas } from '../data.js';
 import retrato from '../assets/retrato.jpg';
 
@@ -11,25 +13,52 @@ const imgs: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(files).map(([k, v]) => [k.split('/').pop()!.replace(/\.\w+$/, ''), v.default]),
 );
 
-// Texturas WebGL: webp ligeros generados en el build.
-const gl = await Promise.all(
-  proyectos.map(async (p) => {
-    const src = imgs[p.img.src];
-    const t = await getImage({ src, width: Math.min(1400, src.width), format: 'webp', quality: 76 });
-    return { id: p.id, bg: p.bg, ink: p.ink, tex: t.src, w: src.width, h: src.height };
-  }),
-);
-// Miniaturas de la tarjeta (abajo a la izquierda).
-const thumbs = await Promise.all(
-  proyectos.map(async (p) => (await getImage({ src: imgs[p.thumb.src], width: 440, format: 'webp', quality: 74 })).src),
-);
-
 const n = proyectos.length;
 const pad = (i: number) => String(i + 1).padStart(2, '0');
 const desc = 'Íñigo Guzmán, técnico superior ASIR especializándose en IA y Big Data. Cinco proyectos: un SOC multi-cloud con IA, HaizeLab, desgaste de herramienta CNC, Celestial Constellation AI y LUXAI.';
 const site = Astro.site ?? new URL('https://inigoguzman.vercel.app');
 const og = new URL('/og.jpg', site).href;
-const arrow = '<svg viewBox="0 0 18 12" aria-hidden="true"><path d="M12 1l5 5-5 5M17 6H1" /></svg>';
+
+const oficios = [
+  {
+    id: 'sistemas',
+    titulo: 'Sistemas',
+    mq: 'Sistemas · DigitalOcean · Azure · WireGuard · Docker · ',
+    dur: '20s',
+    tilts: [
+      { t: 'Cowrie', r: '-7deg', d: '0s' },
+      { t: 'WireGuard', r: '4deg', d: '0.05s' },
+      { t: 'Llama 3.1', r: '-2deg', d: '0.1s' },
+    ],
+    texto: 'Monto la red antes que el modelo. En el SOC, los honeypots Cowrie están en DigitalOcean (Nueva York y Fráncfort) y el análisis en Azure. Entre ellos solo hay WireGuard.',
+  },
+  {
+    id: 'medicion',
+    titulo: 'Medición',
+    mq: 'Medición · NO₂ · ZBE Bilbao · InfluxDB · Grafana · ',
+    dur: '40s',
+    tilts: [
+      { t: '−6,4 %', r: '6deg', d: '0s' },
+      { t: '332.776 h', r: '-4deg', d: '0.05s' },
+      { t: '8 estaciones', r: '2deg', d: '0.1s' },
+    ],
+    texto: 'Me fío de un número si puedo decir de dónde sale. En HaizeLab fueron 332.776 registros horarios de 8 estaciones, y un contraste dentro y fuera de la ZBE de Bilbao.',
+  },
+  {
+    id: 'modelos',
+    titulo: 'Modelos',
+    mq: 'Modelos · XGBoost · SHAP · Canvas · Astro · ',
+    dur: '20s',
+    tilts: [
+      { t: '48 señales', r: '-6deg', d: '0s' },
+      { t: '99,89 %', r: '5deg', d: '0.05s' },
+      { t: '72 h', r: '-3deg', d: '0.1s' },
+    ],
+    texto: 'El modelo tiene que aguantar una pieza, un cielo o una foto que no ha visto. XGBoost con SHAP en la fresa, similitud angular en las estrellas, vídeo a partir de las fotos reales.',
+  },
+];
+
+const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2a5.2 5.2 0 1 1-1.3-3.5"/><path d="M12.2 1.6v3.4H8.8"/></svg>`;
 ---
 <html lang="es">
 <head>
@@ -48,130 +77,279 @@ const arrow = '<svg viewBox="0 0 18 12" aria-hidden="true"><path d="M12 1l5 5-5 
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content={og} />
-  <meta name="theme-color" content="#0b0b0b" />
+  <meta name="theme-color" content="#f3efe6" />
+  <meta name="color-scheme" content="light" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="preload" as="image" href={gl[0].tex} type="image/webp" fetchpriority="high" />
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org', '@type': 'Person', name: 'Íñigo Guzmán', url: site.href,
     jobTitle: 'Técnico Superior en Administración de Sistemas Informáticos en Red',
     address: { '@type': 'PostalAddress', addressLocality: 'Getxo', addressRegion: 'Bizkaia', addressCountry: 'ES' },
     email: `mailto:${contacto.email}`, sameAs: [contacto.github, contacto.linkedin],
   })} />
-  <script is:inline>document.documentElement.classList.add('js');</script>
 </head>
-<body style={`--bg:${proyectos[0].bg};--ink:${proyectos[0].ink}`}>
-  <canvas class="gl" aria-hidden="true"></canvas>
-  <div class="bgdom" aria-hidden="true"></div>
-
-  <div class="loader" aria-hidden="true">
-    <p class="loader-name"><span>Íñigo Guzmán</span></p>
-    <p class="loader-role"><span>Sistemas · Cloud · Datos e IA</span></p>
-    <p class="loader-card">Técnico Superior en ASIR. Ahora, especialización en IA y Big Data en CIFP Somorrostro.</p>
-    <span class="loader-line"></span>
-  </div>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <div id="live" class="sr-only" aria-live="polite"></div>
 
   <header class="hdr">
-    <a class="hdr-name" href="/" data-home>Íñigo Guzmán</a>
-    <button class="hdr-back" type="button" data-close>
-      <svg viewBox="0 0 18 12" aria-hidden="true"><path d="M6 1 1 6l5 5M1 6h16" /></svg>Volver
-    </button>
-    <a class="hdr-about" href="#sobre-mi" data-about>Sobre mí</a>
+    <a class="brand" href="#contenido">
+      <span class="brand-full">Íñigo Guzmán</span>
+      <span class="brand-short">Íñigo</span>
+    </a>
+    <nav class="hdr-nav" aria-label="Secciones">
+      <a href="#proyectos">Proyectos</a>
+      <a href="#oficio">Oficio</a>
+      <a href="#recorrido">Recorrido</a>
+      <a href="#contacto">Contacto</a>
+      <button class="text-btn" type="button" data-copy={contacto.email}>
+        <span class="btn-label">Copiar</span>
+      </button>
+    </nav>
+    <button class="text-btn hdr-menu" type="button" data-menu aria-expanded="false" aria-controls="menu">Menú</button>
   </header>
 
-  <main id="contenido" class="home">
-    <h1 class="sr-only">Íñigo Guzmán: sistemas, cloud, datos e IA. Proyectos seleccionados.</h1>
-    <div class="track" aria-hidden="true">
-      <div class="track-in">
+  <dialog id="menu" class="menu" aria-label="Secciones">
+    <div class="menu-top">
+      <p class="kicker">Íñigo Guzmán</p>
+      <button class="text-btn" type="button" data-close>Cerrar</button>
+    </div>
+    <nav>
+      <a href="#proyectos">Proyectos</a>
+      <a href="#oficio">Oficio</a>
+      <a href="#recorrido">Recorrido</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <p class="menu-mail"><a href={`mailto:${contacto.email}`}>{contacto.email}</a></p>
+  </dialog>
+
+  <main id="contenido">
+    <section class="hero" aria-labelledby="nombre">
+      <div class="hero-clip">
+        <div class="hero-track rise rise-title">
+          <h1 id="nombre">Íñigo Guzmán</h1>
+          <span aria-hidden="true">Íñigo Guzmán</span>
+          <span aria-hidden="true">Íñigo Guzmán</span>
+          <span aria-hidden="true">Íñigo Guzmán</span>
+        </div>
+      </div>
+      <div class="hero-grid">
+        <figure class="hero-photo rise">
+          <Image
+            src={retrato}
+            alt="Retrato de Íñigo Guzmán, sonriendo, junto a un río de agua turquesa."
+            widths={[320, 520]}
+            sizes="(max-width: 800px) 220px, 260px"
+            loading="eager"
+            fetchpriority="high"
+          />
+          <figcaption>{contacto.lugar}</figcaption>
+        </figure>
+        <div class="hero-main rise">
+          <p class="lede">Soy técnico superior en ASIR y curso la especialización en IA y Big Data en CIFP Somorrostro. Me interesa llevar modelos y pipelines de datos a infraestructura real.</p>
+          <ol class="toc">
+            {proyectos.map((p, i) => (
+              <li>
+                <a href={`#${p.id}`}>
+                  <span>{pad(i)}</span>
+                  <span>{p.titulo}</span>
+                  <span class="mini">{p.meta}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div class="hero-side rise">
+          <p class="kicker"><span class="mark" aria-hidden="true"></span>En curso</p>
+          <p class="side-title">IA y Big Data</p>
+          <p class="side-note">CIFP Somorrostro · 2026–27</p>
+          <button class="text-btn" type="button" data-copy={contacto.email}>
+            <span class="btn-label">Copiar correo</span>
+          </button>
+          <a href={`mailto:${contacto.email}`}>{contacto.email}</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="proyectos" aria-labelledby="proy-t">
+      <header class="sec-head">
+        <div>
+          <p class="kicker">01 — {pad(n - 1)}</p>
+          <h2 id="proy-t">Trabajo seleccionado</h2>
+        </div>
+        <p class="sec-note">Cinco piezas. La ficha gira: delante el cartel, detrás el número y el método.</p>
+      </header>
+      <div class="stack">
         {proyectos.map((p, i) => (
-          <a class="still" href={`#${p.id}`} data-open={i} tabindex="-1" data-i={i} style={`--i:${i}`}>
-            <Image src={imgs[p.img.src]} alt="" widths={[480, 800, 1200]} sizes="(max-width: 820px) 88vw, 46vw" loading={i < 2 ? 'eager' : 'lazy'} />
-          </a>
+          <article class="sheet" id={p.id} data-sheet style={`--z:${i + 1};--bg:${p.bg};--ink:${p.ink}`}>
+            <h3 class="sr-only" id={`${p.id}-t`}>{p.nombre}</h3>
+            <div class="plate">
+              <div class="flip" data-flip data-name={p.nombre} aria-labelledby={`${p.id}-t`}>
+                <div class="flip-inner">
+                  <div class="face face-front">
+                    <div class="face-copy">
+                      <div class="face-top">
+                        <span class="idx">{pad(i)}</span>
+                        <p class="meta">{p.meta}</p>
+                      </div>
+                      <p class="face-title" aria-hidden="true">{p.titulo}</p>
+                      <p class="line">{p.linea}</p>
+                      <button class="turn" type="button" data-turn aria-pressed="false">
+                        <span>Girar ficha</span>
+                        <Fragment set:html={turnIcon} />
+                      </button>
+                    </div>
+                    <figure class="shot-main">
+                      <Image src={imgs[p.img.src]} alt={p.img.alt} widths={[640, 960, 1400]} sizes="(max-width: 800px) 94vw, 42vw" loading={i === 0 ? 'eager' : 'lazy'} />
+                    </figure>
+                  </div>
+                  <div class="face face-back">
+                    <div class="back-copy">
+                      <div class="back-top">
+                        <span class="idx">{pad(i)}</span>
+                        <p class="meta">{p.nombre}</p>
+                      </div>
+                      <p class="cifra">{p.cifra}</p>
+                      <p class="cifra-text">{p.cifraTexto}</p>
+                      <p class="detalle">{p.detalle}</p>
+                      <ul class="tech" aria-label="Tecnologías">
+                        {p.stack.map((s) => <li>{s}</li>)}
+                      </ul>
+                      <p class="links">
+                        {p.enlaces.map((l) => <a href={l.u} target="_blank" rel="noopener noreferrer">{l.t}</a>)}
+                      </p>
+                      <button class="turn" type="button" data-turn aria-pressed="false">
+                        <span>Girar ficha</span>
+                        <Fragment set:html={turnIcon} />
+                      </button>
+                    </div>
+                    <div class="gallery">
+                      {p.extra.map((e) => (
+                        <figure class={e.movil ? 'shot is-phone' : 'shot'}>
+                          <Image src={imgs[e.src]} alt={e.alt} widths={[480, 960]} sizes="(max-width: 800px) 88vw, 36vw" loading="lazy" />
+                          <figcaption>{e.pie}</figcaption>
+                        </figure>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
         ))}
       </div>
-    </div>
-    <ol class="titles" aria-label="Proyectos">
-      {proyectos.map((p, i) => (
-        <li class="t" data-i={i} style={`--bg:${p.bg};--ink:${p.ink}`} aria-roledescription="proyecto" aria-label={`${i + 1} de ${n}: ${p.nombre}`}>
-          <p class="t-meta"><span>{pad(i)}</span>{p.meta}</p>
-          <h2 class="t-title">{p.titulo}</h2>
-          <p class="t-line">{p.linea}</p>
-          <a class="t-open" href={`#${p.id}`} data-open={i}>Ver proyecto <Fragment set:html={arrow} /></a>
-        </li>
-      ))}
-    </ol>
+    </section>
 
-    <div class="card" aria-hidden="true">
-      <div class="card-in">
-        <span class="card-face"><img alt="" src={thumbs[0]} width="440" height="259" decoding="async" /></span>
-        <span class="card-face is-back"><img alt="" src={thumbs[1]} width="440" height="259" decoding="async" /></span>
-      </div>
-    </div>
-
-    <nav class="dots" aria-label="Ir al proyecto">
+    <nav class="rail" aria-label="Ir al proyecto">
       {proyectos.map((p, i) => (
-        <button type="button" data-go={i} aria-label={p.nombre} aria-current={i === 0 ? 'true' : undefined}><em class="dl" aria-hidden="true">{p.nombre}</em><span></span></button>
+        <a href={`#${p.id}`} aria-label={p.nombre}>{pad(i)}</a>
       ))}
     </nav>
+
+    <section id="oficio" aria-labelledby="oficio-t">
+      <header class="sec-head">
+        <div>
+          <p class="kicker">02</p>
+          <h2 id="oficio-t">Cómo trabajo</h2>
+        </div>
+        <div>
+          <p class="sec-note">Tres modos que se repiten en los proyectos. La ficha también gira.</p>
+          <button class="text-btn" type="button" data-pause-mq aria-pressed="false" style="margin-top:14px">
+            <span class="btn-label">Pausar rótulos</span>
+          </button>
+        </div>
+      </header>
+      <div class="oficio-grid">
+        {oficios.map((o) => (
+          <article class="tile" id={o.id}>
+            <h3 class="sr-only">{o.titulo}</h3>
+            <div class="flip" data-flip data-name={o.titulo}>
+              <div class="flip-inner">
+                <div class="face face-front">
+                  <div class="mq" style={`--mq:${o.dur}`}>
+                    <div class="mq-track">
+                      <span>{o.mq}{o.mq}</span>
+                      <span aria-hidden="true">{o.mq}{o.mq}</span>
+                    </div>
+                  </div>
+                  <p class="tile-word" aria-hidden="true">{o.titulo}</p>
+                  <div class="tilts">
+                    {o.tilts.map((tilt) => (
+                      <p class="tilt" style={`--r:${tilt.r};--d:${tilt.d}`} aria-hidden="true">{tilt.t}</p>
+                    ))}
+                  </div>
+                  <button class="turn" type="button" data-turn aria-pressed="false">
+                    <span>Girar ficha</span>
+                    <Fragment set:html={turnIcon} />
+                  </button>
+                </div>
+                <div class="face face-back">
+                  <p class="kicker">{o.titulo}</p>
+                  <p class="tile-body">{o.texto}</p>
+                  <button class="turn" type="button" data-turn aria-pressed="false">
+                    <span>Girar ficha</span>
+                    <Fragment set:html={turnIcon} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section id="recorrido" aria-labelledby="rec-t">
+      <header class="sec-head">
+        <div>
+          <p class="kicker">03</p>
+          <h2 id="rec-t">Recorrido</h2>
+        </div>
+        <p class="sec-note">{idiomas}</p>
+      </header>
+      <ol class="cv">
+        {trayectoria.map((t) => (
+          <li>
+            <span class="y">{t.a}</span>
+            <span class="tt">{t.t}</span>
+            <p class="d">{t.d}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section id="contacto" class="contact" aria-labelledby="con-t">
+      <header class="sec-head" style="padding-left:0;padding-right:0">
+        <div>
+          <p class="kicker">04 · {contacto.lugar}</p>
+          <h2 id="con-t">Escríbeme</h2>
+        </div>
+        <p class="sec-note">El correo es el camino corto. También dejo GitHub, LinkedIn y el CV.</p>
+      </header>
+      <a class="email-xl" href={`mailto:${contacto.email}`}>{contacto.email}</a>
+      <div class="contact-actions">
+        <button class="text-btn" type="button" data-copy={contacto.email}>
+          <span class="btn-label">Copiar correo</span>
+        </button>
+        <a href={contacto.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href={contacto.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="/cv.pdf" download="CV-Inigo-Guzman.pdf">Descargar CV</a>
+      </div>
+      <p class="lang">{idiomas}. {contacto.lugar}.</p>
+    </section>
   </main>
 
-  {proyectos.map((p, i) => (
-    <article class="case" id={p.id} data-case={i} aria-labelledby={`${p.id}-t`} style={`--bg:${p.bg};--ink:${p.ink}`}>
-      <div class="case-hero">
-        <p class="case-meta"><span>{pad(i)}</span>{p.meta}</p>
-        <h2 class="case-title" id={`${p.id}-t`}><span>{p.nombre}</span></h2>
-        <figure class="case-still"><Image src={imgs[p.img.src]} alt={p.img.alt} widths={[600, 900, 1300]} sizes="(max-width: 820px) 88vw, 46vw" loading="lazy" /></figure>
-        <span class="case-scroll" aria-hidden="true"><svg viewBox="0 0 12 16"><path d="M6 1v14M1 10l5 5 5-5" /></svg></span>
-      </div>
-      <div class="case-body">
-        <div class="case-intro">
-          <p class="case-num"><strong>{p.cifra}</strong><span>{p.cifraTexto}</span></p>
-          <div>
-            <p class="case-line">{p.detalle}</p>
-            <ul class="case-stack" aria-label="Tecnologías">{p.stack.map((s) => <li>{s}</li>)}</ul>
-            <p class="case-links">
-              {p.enlaces.map((l) => <a href={l.u} target="_blank" rel="noopener">{l.t}<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" /></svg></a>)}
-            </p>
-          </div>
-        </div>
-        <div class="case-extra">
-          {p.extra.map((e) => (
-            <figure class={e.movil ? 'is-movil' : ''}>
-              <Image src={imgs[e.src]} alt={e.alt} widths={[480, 900]} sizes="(max-width: 820px) 88vw, 40vw" loading="lazy" />
-              <figcaption>{e.pie}</figcaption>
-            </figure>
-          ))}
-        </div>
-        <button class="case-next" type="button" data-next={(i + 1) % n}>
-          <span>Siguiente proyecto</span><strong>{proyectos[(i + 1) % n].titulo}</strong>
-        </button>
-      </div>
-    </article>
-  ))}
-  <div class="cover" aria-hidden="true"></div>
+  <footer class="colophon">
+    <p class="colo-name">Íñigo Guzmán</p>
+    <p class="colo-sub">Sistemas, cloud, datos e IA</p>
+  </footer>
 
-  <section class="about" id="sobre-mi" aria-labelledby="about-t">
-    <div class="about-photo">
-      <Image src={retrato} alt="Retrato de Íñigo Guzmán, sonriendo, junto a un río de agua turquesa." widths={[352]} sizes="(max-width: 820px) 60vw, 22rem" loading="lazy" />
-    </div>
-    <div class="about-txt">
-      <h2 class="about-title" id="about-t">Hola,<br />soy Íñigo</h2>
-      <p class="about-bio">Sysadmin especializándome en IA y Big Data. Me interesa llevar modelos y pipelines de datos a infraestructura real.</p>
-      <ul class="about-cv">
-        {trayectoria.map((t) => <li><span class="y">{t.a}</span><span class="tt">{t.t}</span><span class="d">{t.d}</span></li>)}
-      </ul>
-      <p class="about-lang">{idiomas} · {contacto.lugar}</p>
-      <p class="about-links">
-        <a href={`mailto:${contacto.email}`}>{contacto.email}</a>
-        <a href={contacto.github} target="_blank" rel="noopener">GitHub</a>
-        <a href={contacto.linkedin} target="_blank" rel="noopener">LinkedIn</a>
-        <a href="/cv.pdf" download="CV-Inigo-Guzman.pdf">Descargar CV</a>
-      </p>
-    </div>
-  </section>
-
-  <script type="application/json" id="gl-data" set:html={JSON.stringify({ items: gl, thumbs })} />
+  <script is:inline>
+    document.documentElement.classList.add('js');
+    requestAnimationFrame(function () {
+      document.documentElement.classList.add('is-ready');
+    });
+  </script>
   <script>
-    import { start } from '../scripts/app.js';
+    import { start } from '../scripts/motion.js';
     start();
   </script>
 </body>
