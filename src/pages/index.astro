@@ -2,7 +2,9 @@
 import '@fontsource/big-shoulders-display/700';
 import '@fontsource/big-shoulders-display/800';
 import '@fontsource/literata/400.css';
+import '@fontsource/literata/400-italic.css';
 import '@fontsource/literata/600.css';
+import '@fontsource/literata/700-italic.css';
 import '../styles/global.css';
 import { Image } from 'astro:assets';
 import { contacto, proyectos, trayectoria, idiomas } from '../data.js';
@@ -61,7 +63,7 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content={og} />
-  <meta name="theme-color" content="#f4efe8" />
+  <meta name="theme-color" content="#f6efe8" />
   <meta name="color-scheme" content="light" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -74,25 +76,6 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
 <body>
   <a class="skip" href="#contenido">Saltar al contenido</a>
   <div id="live" class="sr-only" aria-live="polite"></div>
-
-  <header class="hdr">
-    <a class="brand" href="#contenido">
-      <span class="brand-full">Íñigo Guzmán</span>
-      <span class="brand-short">Íñigo</span>
-    </a>
-    <nav class="hdr-nav" aria-label="Secciones">
-      <a href="#proyectos">Proyectos</a>
-      <a href="#oficio">Oficio</a>
-      <a href="#recorrido">Recorrido</a>
-      <a href="#contacto">Contacto</a>
-    </nav>
-    <div class="hdr-actions">
-      <button class="text-btn" type="button" data-copy={contacto.email}>
-        <span class="btn-label">Copiar correo</span>
-      </button>
-      <button class="text-btn hdr-menu" type="button" data-menu aria-expanded="false" aria-controls="menu">Menú</button>
-    </div>
-  </header>
 
   <dialog id="menu" class="menu" aria-label="Secciones">
     <div class="menu-top">
@@ -108,39 +91,59 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
     <p class="menu-mail"><a href={`mailto:${contacto.email}`}>{contacto.email}</a></p>
   </dialog>
 
+  <div class="mast rise rise-title">
+    <div class="hero-track">
+      <h1 id="nombre">Íñigo Guzmán</h1>
+      <span aria-hidden="true">Íñigo Guzmán</span>
+    </div>
+  </div>
+
+  <header class="bar">
+    <a class="mark" href="#contenido">Íñigo</a>
+    <div class="bar-mid">
+      <a class="bar-mail" href={`mailto:${contacto.email}`}>{contacto.email}</a>
+      <button class="text-btn" type="button" data-copy={contacto.email}>
+        <span class="btn-label">Copiar</span>
+      </button>
+      <p class="avail"><span class="star" aria-hidden="true"></span> En curso · 2026–27</p>
+    </div>
+    <nav class="bar-nav" aria-label="Secciones">
+      <a href="#proyectos">Proyectos</a>
+      <a href="#oficio">Oficio</a>
+      <a href="#recorrido">Recorrido</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <button class="text-btn bar-menu" type="button" data-menu aria-expanded="false" aria-controls="menu">Menú</button>
+  </header>
+
   <main id="contenido">
-    <section class="hero" aria-labelledby="nombre">
-      <div class="hero-clip rise rise-title">
-        <div class="hero-track">
-          <h1 id="nombre">Íñigo Guzmán</h1>
-          <span aria-hidden="true">Íñigo Guzmán</span>
-          <span aria-hidden="true">Íñigo Guzmán</span>
-          <span aria-hidden="true">Íñigo Guzmán</span>
+    <section class="stage" aria-label="Presentación">
+      <figure class="portrait rise">
+        <span class="disc" aria-hidden="true"></span>
+        <Image
+          src={retrato}
+          alt="Retrato de Íñigo Guzmán, sonriendo, junto a un río de agua turquesa."
+          widths={[480, 800, 1200]}
+          sizes="(max-width: 800px) 88vw, 46vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+      <div class="stage-copy rise">
+        <ul class="stickers stickers-top">
+          <li class="stk stk-a11y">Accesible</li>
+          <li class="stk stk-mot">Movimiento</li>
+          <li class="stk stk-soc"><span>SOC</span><small>multi-cloud</small></li>
+        </ul>
+        <div class="role-block">
+          <p class="role">Sistemas<span>y datos</span><span>e IA</span></p>
+          <p class="lede">Técnico superior en ASIR. Curso IA y Big Data en CIFP Somorrostro y llevo los modelos a infraestructura real.</p>
+          <p class="stage-mail"><a href={`mailto:${contacto.email}`}>{contacto.email}</a></p>
         </div>
-      </div>
-      <div class="hero-grid">
-        <figure class="hero-photo rise">
-          <Image
-            src={retrato}
-            alt="Retrato de Íñigo Guzmán, sonriendo, junto a un río de agua turquesa."
-            widths={[320, 520]}
-            sizes="(max-width: 800px) 220px, 260px"
-            loading="eager"
-            fetchpriority="high"
-          />
-          <figcaption>{contacto.lugar}</figcaption>
-        </figure>
-        <div class="hero-main rise">
-          <p class="lede">Soy técnico superior en ASIR y curso la especialización en IA y Big Data en CIFP Somorrostro. Me interesa llevar modelos y pipelines de datos a infraestructura real.</p>
-        </div>
-        <div class="hero-side rise">
-          <p class="kicker">En curso</p>
-          <p class="side-note">Especialización en IA y Big Data. CIFP Somorrostro, 2026–27.</p>
-          <button class="text-btn" type="button" data-copy={contacto.email}>
-            <span class="btn-label">Copiar correo</span>
-          </button>
-          <a class="mail" href={`mailto:${contacto.email}`}>{contacto.email}</a>
-        </div>
+        <ul class="stickers stickers-bot">
+          <li class="stk stk-med"><span>Medición</span><small>NO₂ · CNC</small></li>
+          <li class="stk stk-mod"><span>Modelos</span><small>IA aplicada</small></li>
+        </ul>
       </div>
     </section>
 
