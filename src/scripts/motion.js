@@ -1,9 +1,8 @@
-// Apila las fichas y suaviza la rueda.
-// Medido en cydstumpel.nl (oct 2026, rueda de 900px):
-// el scroll no salta; se asienta en 1s con 1 - 2^(-10t)
-// (117px a 16ms, 549 a 122ms, 820 a 341ms, 900 a 1s).
-// No hay scroll-snap. El nombre queda fijo y el bloque siguiente lo tapa.
-// El giro de ficha es transform 1s cubic-bezier(.25, 1, .5, 1).
+// Apila las fichas y mueve el nombre.
+// El nombre queda fijo: en los primeros 50vh se corre hasta -40vw.
+// La franja superior lo deja ver; el papel tapa el resto.
+// La rueda persigue el destino con una constante de ~90ms, sin reiniciar
+// un ease de un segundo en cada tick. El giro de ficha sigue en 1s.
 const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function syncFlip(flip, on) {
@@ -30,7 +29,6 @@ function openHash() {
 }
 
 export function start() {
-  const root = document.documentElement;
   const sheets = [...document.querySelectorAll('[data-sheet]')];
   const flips = [...document.querySelectorAll('[data-flip]')];
   flips.forEach((flip) => syncFlip(flip, flip.classList.contains('is-turned')));
@@ -94,59 +92,104 @@ export function start() {
     });
   }
 
-  const track = document.querySelector('.hero-track');
+  const tracks = [...document.querySelectorAll('.hero-track')];
   const rail = [...document.querySelectorAll('.rail a')];
-  const flow = document.querySelector('.flow');
+  const cards = sheets.map((sheet, index) => ({
+    sheet,
+    plate: sheet.querySelector('.plate'),
+    next: sheets[index + 1] || null,
+  }));
 
-  const layout = () => {
-    const vh = window.innerHeight || 1;
-    const vw = window.innerWidth || 1;
-    const calm = reduce();
-    // Medido en cydstumpel.nl: en los primeros 50vh el nombre se desplaza
-    // hasta -40vw con ease-out quart (1 - (1-p)^4). A 176px ya va por -497px
-    // y se queda en -576px (-40vw a 1440). Bajar mueve a la izquierda; subir, a la derecha.
-    if (track) {
-      if (calm) {
-        track.style.transform = '';
-      } else {
-        const p = Math.min(1, Math.max(0, window.scrollY / (vh * 0.5)));
-        const eased = 1 - (1 - p) ** 4;
-        track.style.transform = `translate3d(${(-0.4 * vw * eased).toFixed(2)}px, 0, 0)`;
-      }
-    }
-    if (flow) {
-      const windowPx = parseFloat(getComputedStyle(root).getPropertyValue('--window')) || 100;
-      const cut = Math.max(0, windowPx - flow.getBoundingClientRect().top);
-      flow.style.clipPath = cut > 0.5 ? `inset(${cut.toFixed(2)}px 0 0 0)` : '';
-    }
-    sheets.forEach((sheet, index) => {
-      const plate = sheet.querySelector('.plate');
-      const next = sheets[index + 1];
-      if (!plate) return;
-      if (calm || !next) {
-        plate.style.transform = '';
-        plate.style.setProperty('--stack', '0');
-        return;
-      }
-      const raw = Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh));
-      plate.style.transform = `scale(${(1 - raw * 0.08).toFixed(4)})`;
-      plate.style.setProperty('--stack', raw.toFixed(4));
+  const stack = document.querySelector('.stack');
+  let vw = 1;
+  let vh = 1;
+  let stackStart = Infinity;
+  let lastX = null;
+  let lastRail = -1;
+  const lastScale = new Map();
+
+  const clearScales = () => {
+    cards.forEach(({ plate }) => {
+      if (!plate || lastScale.get(plate) === 1) return;
+      plate.style.transform = '';
+      lastScale.set(plate, 1);
     });
+  };
 
-    const stack = document.querySelector('.stack');
-    if (stack) {
-      const rect = stack.getBoundingClientRect();
-      root.classList.toggle('is-in-work', rect.top < vh * 0.72 && rect.bottom > vh * 0.28);
+  const measure = () => {
+    vw = window.innerWidth || 1;
+    vh = window.innerHeight || 1;
+    lastX = null;
+    if (stack) stackStart = stack.getBoundingClientRect().top + window.scrollY;
+  };
+
+  // Solo transform. El recorte del nombre lo hace la franja fija,
+  // así el scroll no repinta la página con clip-path ni lee layout.
+  const paint = () => {
+    const calm = reduce();
+    const y = window.scrollY;
+    if (calm) {
+      if (lastX !== 0) {
+        tracks.forEach((track) => { track.style.transform = ''; });
+        lastX = 0;
+      }
+    } else {
+      const p = Math.min(1, Math.max(0, y / (vh * 0.5)));
+      const eased = 1 - (1 - p) ** 4;
+      const x = Math.round(-0.4 * vw * eased * 10) / 10;
+      if (x !== lastX) {
+        const value = `translate3d(${x}px,0,0)`;
+        tracks.forEach((track) => { track.style.transform = value; });
+        lastX = x;
+      }
+    }
+
+    // En la portada no hay nada que medir: el nombre ya se movió con un transform.
+    if (y + vh * 0.9 < stackStart) {
+      clearScales();
+      if (lastRail !== 0) {
+        rail.forEach((link, index) => {
+          if (index === 0) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+        });
+        lastRail = 0;
+      }
+      return;
     }
 
     const mark = vh * 0.42;
     let current = 0;
-    sheets.forEach((sheet, index) => {
-      if (sheet.getBoundingClientRect().top <= mark) current = index;
+    const tops = cards.map((card) => {
+      const top = card.sheet.getBoundingClientRect().top;
+      if (top <= mark) current += 1;
+      return top;
     });
-    rail.forEach((link, index) => {
-      if (index === current) link.setAttribute('aria-current', 'true');
-      else link.removeAttribute('aria-current');
+    current = Math.max(0, current - 1);
+
+    if (current !== lastRail) {
+      rail.forEach((link, index) => {
+        if (index === current) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      });
+      lastRail = current;
+    }
+
+    cards.forEach((card, index) => {
+      const { plate, next } = card;
+      if (!plate) return;
+      const nextTop = next ? tops[index + 1] : null;
+      if (calm || nextTop == null) {
+        if (lastScale.get(plate) !== 1) {
+          plate.style.transform = '';
+          lastScale.set(plate, 1);
+        }
+        return;
+      }
+      const raw = Math.min(1, Math.max(0, 1 - nextTop / vh));
+      const scale = Math.round((1 - raw * 0.08) * 1000) / 1000;
+      if (lastScale.get(plate) === scale) return;
+      lastScale.set(plate, scale);
+      plate.style.transform = scale === 1 ? '' : `scale(${scale})`;
     });
   };
 
@@ -155,63 +198,70 @@ export function start() {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      layout();
+      paint();
       ticking = false;
     });
   };
 
   smoothWheel();
 
-  layout();
+  measure();
+  paint();
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
+  window.addEventListener('resize', () => { measure(); onScroll(); });
   window.addEventListener('hashchange', openHash);
   openHash();
 }
 
-// Cada evento de rueda reinicia un segundo desde la posición actual
-// hacia el nuevo destino. La curva es la misma que usa Cyd en Lenis.
+// La rueda sigue al dedo con una constante corta (~90ms).
+// No reinicia un ease de 1s en cada tick: eso iba siempre por la parte
+// lenta de la curva y se sentía atrasado. El tacto no se intercepta.
 function smoothWheel() {
-  const duration = 1000;
-  const ease = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
+  const tau = 90;
   let current = window.scrollY;
   let target = current;
-  let from = current;
-  let to = current;
-  let started = 0;
   let running = false;
   let fromUs = false;
+  let last = 0;
   let frame = 0;
+  let max = 0;
 
-  const limit = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const limits = () => {
+    max = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  };
   const pixels = (dy, mode) => {
     if (mode === 1) return dy * 16;
     if (mode === 2) return dy * window.innerHeight;
     return dy;
   };
+  const clamp = (y) => Math.max(0, Math.min(max, y));
 
   const tick = (now) => {
-    const t = Math.min(1, (now - started) / duration);
-    current = from + (to - from) * ease(t);
+    const dt = Math.min(34, last ? now - last : 16);
+    last = now;
+    const k = 1 - Math.exp(-dt / tau);
+    current += (target - current) * k;
+    if (Math.abs(target - current) < 0.5) {
+      current = target;
+      running = false;
+    }
     fromUs = true;
     window.scrollTo(0, current);
     fromUs = false;
-    if (t < 1) frame = requestAnimationFrame(tick);
-    else {
-      running = false;
-      current = to;
-    }
+    if (running) frame = requestAnimationFrame(tick);
+  };
+
+  const kick = () => {
+    if (running) return;
+    running = true;
+    last = 0;
+    frame = requestAnimationFrame(tick);
   };
 
   const go = (next) => {
-    target = Math.max(0, Math.min(limit(), next));
-    from = current;
-    to = target;
-    started = performance.now();
-    if (!running) {
-      running = true;
-      frame = requestAnimationFrame(tick);
-    }
+    limits();
+    target = clamp(next);
+    kick();
   };
 
   const stop = () => {
@@ -223,7 +273,8 @@ function smoothWheel() {
   if (!reduce()) {
     window.addEventListener('wheel', (event) => {
       if (event.ctrlKey) return;
-      if (document.querySelector('dialog[open]')) return;
+      const menu = document.getElementById('menu');
+      if (menu?.open) return;
       const scroller = event.target.closest?.('.face');
       if (scroller && scroller.scrollHeight > scroller.clientHeight + 2) {
         const top = scroller.scrollTop <= 0;
@@ -231,7 +282,9 @@ function smoothWheel() {
         if (!(top && event.deltaY < 0) && !(bottom && event.deltaY > 0)) return;
       }
       event.preventDefault();
-      go(target + pixels(event.deltaY, event.deltaMode));
+      if (!running) limits();
+      target = clamp(target + pixels(event.deltaY, event.deltaMode));
+      kick();
     }, { passive: false });
   }
 
@@ -251,16 +304,12 @@ function smoothWheel() {
     const el = id ? document.getElementById(id) : null;
     if (!el) return;
     event.preventDefault();
-    let y = 0;
-    let node = el;
-    while (node) {
-      y += node.offsetTop;
-      node = node.offsetParent;
-    }
+    const y = el.getBoundingClientRect().top + window.scrollY;
     go(y);
     history.pushState(null, '', `#${id}`);
     openHash();
   });
 
+  window.addEventListener('resize', limits);
   window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', stop);
 }

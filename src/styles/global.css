@@ -56,6 +56,18 @@ a { color: inherit; }
 }
 .skip:focus { transform: none; }
 
+.name-window {
+  position: sticky; top: 0; z-index: 30;
+  height: var(--window);
+  margin-bottom: calc(var(--window) * -1);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 2px;
+  background: var(--paper);
+  pointer-events: none;
+  contain: paint;
+}
 .mast {
   position: sticky; top: 0; z-index: 0;
   height: var(--mast);
@@ -65,6 +77,7 @@ a { color: inherit; }
   padding-top: 2px;
   background: transparent;
   pointer-events: none;
+  contain: paint;
 }
 .flow {
   position: relative; z-index: 1;
@@ -74,6 +87,9 @@ a { color: inherit; }
   display: flex; align-items: baseline; width: max-content;
   gap: 0.12em; margin-left: -0.22em;
   font-size: clamp(112px, 15.2vw, 228px); color: var(--coral);
+  text-rendering: geometricPrecision;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 .hero-track h1, .hero-track span {
   margin: 0; font-family: var(--display); font-weight: 800; font-size: 1em;
@@ -243,9 +259,9 @@ a { color: inherit; }
 #proyectos, #oficio, #recorrido, #contacto { scroll-margin-top: 12px; }
 .js .plate { height: 100%; transform-origin: center top; }
 .plate {
-  --stack: 0;
   height: 100%;
-  box-shadow: 0 18px 50px rgba(17, 17, 17, calc(0.05 + var(--stack) * 0.14));
+  box-shadow: 0 18px 40px rgba(17, 17, 17, 0.06);
+  will-change: transform;
 }
 .flip { height: auto; }
 .js .flip { height: 100%; perspective: 1600px; }
@@ -255,7 +271,7 @@ a { color: inherit; }
 .face {
   background: var(--card); color: var(--ink);
   border: 1px solid var(--line);
-  border-radius: calc(2px + var(--stack) * 16px);
+  border-radius: 2px;
 }
 .js .face {
   position: absolute; inset: 0; overflow: auto;
