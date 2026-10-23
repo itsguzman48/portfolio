@@ -198,11 +198,11 @@ a { color: inherit; }
   text-transform: uppercase; text-wrap: balance;
 }
 .line { margin: 0; max-width: 36ch; font-size: clamp(16px, 1.3vw, 18px); }
-.face-copy .line { margin-top: auto; }
-.face-copy .turn { margin-top: 16px; align-self: flex-start; }
+.face-copy .line { margin-top: 4px; }
+.face-copy .turn { margin-top: 22px; align-self: flex-start; }
 .turn {
-  display: none; align-items: center; gap: 8px;
-  border-bottom: 1px solid currentColor; padding-bottom: 3px;
+  display: none; align-items: center; gap: 8px; min-height: 44px;
+  border-bottom: 1px solid currentColor; padding: 10px 0;
 }
 .js .turn { display: inline-flex; }
 .turn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; transition: transform 0.4s var(--ease); }
