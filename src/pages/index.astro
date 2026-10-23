@@ -164,7 +164,10 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
           <article class="sheet" id={p.id} data-sheet style={`--z:${i + 2}`}>
             <h3 class="sr-only" id={`${p.id}-t`}>{p.nombre}</h3>
             <div class="plate">
-              <div class="flip" data-flip data-name={p.nombre} aria-labelledby={`${p.id}-t`}>
+              <div class="flip" data-flip data-name={p.nombre}>
+                <button class="flip-hit" type="button" data-turn aria-pressed="false">
+                  <span class="sr-only">Girar ficha de {p.nombre}</span>
+                </button>
                 <div class="flip-inner">
                   <div class="face face-front">
                     <div class="face-copy">
@@ -174,10 +177,10 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
                       </div>
                       <p class="face-title" aria-hidden="true">{p.titulo}</p>
                       <p class="line">{p.linea}</p>
-                      <button class="turn" type="button" data-turn aria-pressed="false">
+                      <p class="turn" aria-hidden="true">
                         <span>Girar ficha</span>
                         <Fragment set:html={turnIcon} />
-                      </button>
+                      </p>
                     </div>
                     <figure class="shot-main">
                       <Image src={imgs[p.img.src]} alt={p.img.alt} widths={[640, 960, 1400]} sizes="(max-width: 800px) 94vw, 42vw" loading={i === 0 ? 'eager' : 'lazy'} />
@@ -198,10 +201,10 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
                       <p class="links">
                         {p.enlaces.map((l) => <a href={l.u} target="_blank" rel="noopener noreferrer">{l.t}</a>)}
                       </p>
-                      <button class="turn" type="button" data-turn aria-pressed="false">
-                        <span>Girar ficha</span>
+                      <p class="turn" aria-hidden="true">
+                        <span>Volver</span>
                         <Fragment set:html={turnIcon} />
-                      </button>
+                      </p>
                     </div>
                     <div class="gallery">
                       {p.extra.map((e) => (
@@ -238,6 +241,9 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
           <article class="tile" id={o.id}>
             <h3 class="sr-only">{o.titulo}</h3>
             <div class="flip" data-flip data-name={o.titulo}>
+              <button class="flip-hit" type="button" data-turn aria-pressed="false">
+                <span class="sr-only">Girar ficha de {o.titulo}</span>
+              </button>
               <div class="flip-inner">
                 <div class="face face-front">
                   <div class="mq" style={`--mq:${o.dur}`}>
@@ -247,18 +253,18 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
                     </div>
                   </div>
                   <p class="tile-word" aria-hidden="true">{o.titulo}</p>
-                  <button class="turn" type="button" data-turn aria-pressed="false">
+                  <p class="turn" aria-hidden="true">
                     <span>Girar ficha</span>
                     <Fragment set:html={turnIcon} />
-                  </button>
+                  </p>
                 </div>
                 <div class="face face-back">
                   <p class="kicker">{o.titulo}</p>
                   <p class="tile-body">{o.texto}</p>
-                  <button class="turn" type="button" data-turn aria-pressed="false">
-                    <span>Girar ficha</span>
+                  <p class="turn" aria-hidden="true">
+                    <span>Volver</span>
                     <Fragment set:html={turnIcon} />
-                  </button>
+                  </p>
                 </div>
               </div>
             </div>

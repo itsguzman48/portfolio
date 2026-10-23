@@ -275,8 +275,19 @@ function smoothWheel() {
       if (event.ctrlKey) return;
       const menu = document.getElementById('menu');
       if (menu?.open) return;
-      const scroller = event.target.closest?.('.face');
+      const flip = event.target.closest?.('[data-flip]');
+      const scroller = event.target.closest?.('.face')
+        || flip?.querySelector('.face:not([inert])');
       if (scroller && scroller.scrollHeight > scroller.clientHeight + 2) {
+        if (event.target.closest?.('.flip-hit') && !(event.target.closest?.('.face'))) {
+          const top = scroller.scrollTop <= 0;
+          const bottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+          if (!(top && event.deltaY < 0) && !(bottom && event.deltaY > 0)) {
+            scroller.scrollTop += pixels(event.deltaY, event.deltaMode);
+            event.preventDefault();
+            return;
+          }
+        }
         const top = scroller.scrollTop <= 0;
         const bottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
         if (!(top && event.deltaY < 0) && !(bottom && event.deltaY > 0)) return;

@@ -264,9 +264,18 @@ a { color: inherit; }
   will-change: transform;
 }
 .flip { height: auto; }
-.js .flip { height: 100%; perspective: 1600px; }
+.js .flip { position: relative; height: 100%; perspective: 1600px; }
+.flip-hit {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%; cursor: pointer; border-radius: 2px;
+}
+.flip-hit:focus-visible { outline-offset: -4px; }
 .flip-inner { position: relative; }
-.js .flip-inner { height: 100%; transform-style: preserve-3d; transition: transform 1s var(--ease); }
+.js .flip-inner {
+  z-index: 2; height: 100%; pointer-events: none;
+  transform-style: preserve-3d; transition: transform 1s var(--ease);
+}
+.js .flip a { pointer-events: auto; position: relative; }
 .js .flip.is-turned .flip-inner { transform: rotateY(180deg); }
 .face {
   background: var(--card); color: var(--ink);
@@ -308,12 +317,12 @@ a { color: inherit; }
 .line { margin: 0; max-width: 34ch; font-size: 17px; line-height: 1.55; }
 .face-copy .turn { margin-top: 8px; align-self: flex-start; }
 .turn {
-  display: none; align-items: center; gap: 10px; min-height: 44px;
+  display: none; align-items: center; gap: 10px; min-height: 44px; margin: 0;
   padding: 8px 0 10px; border-bottom: 1px solid currentColor;
 }
 .js .turn { display: inline-flex; }
 .turn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; transition: transform 0.4s var(--ease); }
-.turn:hover svg { transform: rotate(-40deg); }
+.flip:hover .turn svg { transform: rotate(-40deg); }
 
 .face-back { padding: clamp(22px, 2.6vw, 40px); }
 .js .face-back {
