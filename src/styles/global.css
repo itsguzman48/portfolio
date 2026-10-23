@@ -124,12 +124,12 @@ a { color: inherit; }
 .bar-nav a {
   font-size: 16px; text-decoration: none; white-space: nowrap;
 }
-.bar-nav a, .text-btn, .turn {
+.bar-nav a, .text-btn {
   font-family: var(--display); font-weight: 700; line-height: 1;
   letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
 }
 .bar-nav a { font-family: var(--serif); font-weight: 400; font-size: 16px; letter-spacing: 0; text-transform: none; }
-.text-btn, .turn { font-size: 13px; }
+.text-btn { font-size: 13px; }
 .bar-nav a, .text-btn { position: relative; }
 .bar-nav a::after, .text-btn::after {
   content: ''; position: absolute; left: 0; right: 0; bottom: -5px; height: 1px;
@@ -315,14 +315,6 @@ a { color: inherit; }
   text-transform: uppercase; text-wrap: balance;
 }
 .line { margin: 0; max-width: 34ch; font-size: 17px; line-height: 1.55; }
-.face-copy .turn { margin-top: 8px; align-self: flex-start; }
-.turn {
-  display: none; align-items: center; gap: 10px; min-height: 44px; margin: 0;
-  padding: 8px 0 10px; border-bottom: 1px solid currentColor;
-}
-.js .turn { display: inline-flex; }
-.turn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; transition: transform 0.4s var(--ease); }
-.flip:hover .turn svg { transform: rotate(-40deg); }
 
 .face-back { padding: clamp(22px, 2.6vw, 40px); }
 .js .face-back {
@@ -353,7 +345,6 @@ a { color: inherit; }
 .shot img { width: 100%; display: block; }
 .shot figcaption { margin-top: 8px; font-size: 14px; line-height: 1.4; color: var(--muted); }
 .is-phone { max-width: 200px; }
-.back-copy .turn { margin-top: 18px; }
 
 .oficio-grid {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
@@ -378,7 +369,6 @@ a { color: inherit; }
   font-size: clamp(64px, 5.5vw, 92px); line-height: 0.86; letter-spacing: -0.03em;
   text-transform: uppercase;
 }
-.tile .turn { margin-top: auto; align-self: flex-start; }
 .tile-body { margin: 8px 0 0; font-size: 18px; line-height: 1.55; max-width: 34ch; }
 
 .cv { list-style: none; margin: 0; padding: 8px var(--pad) 12px; }
@@ -445,7 +435,7 @@ main { background: var(--paper); position: relative; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .flip-inner, .turn svg { transition: none; }
+  .js .flip-inner { transition: none; }
 }
 @keyframes ticker {
   from { transform: translateX(0); }

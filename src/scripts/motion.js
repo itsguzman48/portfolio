@@ -10,8 +10,10 @@ function syncFlip(flip, on) {
   const back = flip.querySelector('.face-back');
   if (front) front.inert = on;
   if (back) back.inert = !on;
+  const name = flip.dataset.name || 'la ficha';
   flip.querySelectorAll('[data-turn]').forEach((btn) => {
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.setAttribute('aria-label', on ? `Volver a la portada de ${name}` : `Girar ficha de ${name}`);
   });
 }
 
