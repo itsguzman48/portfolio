@@ -13,7 +13,6 @@ const imgs: Record<string, ImageMetadata> = Object.fromEntries(
   Object.entries(files).map(([k, v]) => [k.split('/').pop()!.replace(/\.\w+$/, ''), v.default]),
 );
 
-const n = proyectos.length;
 const pad = (i: number) => String(i + 1).padStart(2, '0');
 const desc = 'Íñigo Guzmán, técnico superior ASIR especializándose en IA y Big Data. Cinco proyectos: un SOC multi-cloud con IA, HaizeLab, desgaste de herramienta CNC, Celestial Constellation AI y LUXAI.';
 const site = Astro.site ?? new URL('https://inigoguzman.vercel.app');
@@ -25,11 +24,6 @@ const oficios = [
     titulo: 'Sistemas',
     mq: 'Sistemas · DigitalOcean · Azure · WireGuard · Docker · ',
     dur: '20s',
-    tilts: [
-      { t: 'Cowrie', r: '-7deg', d: '0s' },
-      { t: 'WireGuard', r: '4deg', d: '0.05s' },
-      { t: 'Llama 3.1', r: '-2deg', d: '0.1s' },
-    ],
     texto: 'Monto la red antes que el modelo. En el SOC, los honeypots Cowrie están en DigitalOcean (Nueva York y Fráncfort) y el análisis en Azure. Entre ellos solo hay WireGuard.',
   },
   {
@@ -37,11 +31,6 @@ const oficios = [
     titulo: 'Medición',
     mq: 'Medición · NO₂ · ZBE Bilbao · InfluxDB · Grafana · ',
     dur: '40s',
-    tilts: [
-      { t: '−6,4 %', r: '6deg', d: '0s' },
-      { t: '332.776 h', r: '-4deg', d: '0.05s' },
-      { t: '8 estaciones', r: '2deg', d: '0.1s' },
-    ],
     texto: 'Me fío de un número si puedo decir de dónde sale. En HaizeLab fueron 332.776 registros horarios de 8 estaciones, y un contraste dentro y fuera de la ZBE de Bilbao.',
   },
   {
@@ -49,11 +38,6 @@ const oficios = [
     titulo: 'Modelos',
     mq: 'Modelos · XGBoost · SHAP · Canvas · Astro · ',
     dur: '20s',
-    tilts: [
-      { t: '48 señales', r: '-6deg', d: '0s' },
-      { t: '99,89 %', r: '5deg', d: '0.05s' },
-      { t: '72 h', r: '-3deg', d: '0.1s' },
-    ],
     texto: 'El modelo tiene que aguantar una pieza, un cielo o una foto que no ha visto. XGBoost con SHAP en la fresa, similitud angular en las estrellas, vídeo a partir de las fotos reales.',
   },
 ];
@@ -77,7 +61,7 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content={og} />
-  <meta name="theme-color" content="#f3efe6" />
+  <meta name="theme-color" content="#f4efe8" />
   <meta name="color-scheme" content="light" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -101,11 +85,13 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
       <a href="#oficio">Oficio</a>
       <a href="#recorrido">Recorrido</a>
       <a href="#contacto">Contacto</a>
-      <button class="text-btn" type="button" data-copy={contacto.email}>
-        <span class="btn-label">Copiar</span>
-      </button>
     </nav>
-    <button class="text-btn hdr-menu" type="button" data-menu aria-expanded="false" aria-controls="menu">Menú</button>
+    <div class="hdr-actions">
+      <button class="text-btn" type="button" data-copy={contacto.email}>
+        <span class="btn-label">Copiar correo</span>
+      </button>
+      <button class="text-btn hdr-menu" type="button" data-menu aria-expanded="false" aria-controls="menu">Menú</button>
+    </div>
   </header>
 
   <dialog id="menu" class="menu" aria-label="Secciones">
@@ -146,41 +132,25 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
         </figure>
         <div class="hero-main rise">
           <p class="lede">Soy técnico superior en ASIR y curso la especialización en IA y Big Data en CIFP Somorrostro. Me interesa llevar modelos y pipelines de datos a infraestructura real.</p>
-          <ol class="toc">
-            {proyectos.map((p, i) => (
-              <li>
-                <a href={`#${p.id}`}>
-                  <span>{pad(i)}</span>
-                  <span>{p.titulo}</span>
-                  <span class="mini">{p.meta}</span>
-                </a>
-              </li>
-            ))}
-          </ol>
         </div>
         <div class="hero-side rise">
-          <p class="kicker"><span class="mark" aria-hidden="true"></span>En curso</p>
-          <p class="side-title">IA y Big Data</p>
-          <p class="side-note">CIFP Somorrostro · 2026–27</p>
+          <p class="kicker">En curso</p>
+          <p class="side-note">Especialización en IA y Big Data. CIFP Somorrostro, 2026–27.</p>
           <button class="text-btn" type="button" data-copy={contacto.email}>
             <span class="btn-label">Copiar correo</span>
           </button>
-          <a href={`mailto:${contacto.email}`}>{contacto.email}</a>
+          <a class="mail" href={`mailto:${contacto.email}`}>{contacto.email}</a>
         </div>
       </div>
     </section>
 
     <section id="proyectos" aria-labelledby="proy-t">
       <header class="sec-head">
-        <div>
-          <p class="kicker">01 — {pad(n - 1)}</p>
-          <h2 id="proy-t">Trabajo seleccionado</h2>
-        </div>
-        <p class="sec-note">Cinco piezas. La ficha gira: delante el cartel, detrás el número y el método.</p>
+        <h2 id="proy-t">Trabajo</h2>
       </header>
       <div class="stack">
         {proyectos.map((p, i) => (
-          <article class="sheet" id={p.id} data-sheet style={`--z:${i + 1};--bg:${p.bg};--ink:${p.ink}`}>
+          <article class="sheet" id={p.id} data-sheet style={`--z:${i + 1}`}>
             <h3 class="sr-only" id={`${p.id}-t`}>{p.nombre}</h3>
             <div class="plate">
               <div class="flip" data-flip data-name={p.nombre} aria-labelledby={`${p.id}-t`}>
@@ -247,16 +217,10 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
 
     <section id="oficio" aria-labelledby="oficio-t">
       <header class="sec-head">
-        <div>
-          <p class="kicker">02</p>
-          <h2 id="oficio-t">Cómo trabajo</h2>
-        </div>
-        <div>
-          <p class="sec-note">Tres modos que se repiten en los proyectos. La ficha también gira.</p>
-          <button class="text-btn" type="button" data-pause-mq aria-pressed="false" style="margin-top:14px">
-            <span class="btn-label">Pausar rótulos</span>
-          </button>
-        </div>
+        <h2 id="oficio-t">Cómo trabajo</h2>
+        <button class="text-btn" type="button" data-pause-mq aria-pressed="false">
+          <span class="btn-label">Pausar rótulos</span>
+        </button>
       </header>
       <div class="oficio-grid">
         {oficios.map((o) => (
@@ -272,11 +236,6 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
                     </div>
                   </div>
                   <p class="tile-word" aria-hidden="true">{o.titulo}</p>
-                  <div class="tilts">
-                    {o.tilts.map((tilt) => (
-                      <p class="tilt" style={`--r:${tilt.r};--d:${tilt.d}`} aria-hidden="true">{tilt.t}</p>
-                    ))}
-                  </div>
                   <button class="turn" type="button" data-turn aria-pressed="false">
                     <span>Girar ficha</span>
                     <Fragment set:html={turnIcon} />
@@ -299,10 +258,7 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
 
     <section id="recorrido" aria-labelledby="rec-t">
       <header class="sec-head">
-        <div>
-          <p class="kicker">03</p>
-          <h2 id="rec-t">Recorrido</h2>
-        </div>
+        <h2 id="rec-t">Recorrido</h2>
         <p class="sec-note">{idiomas}</p>
       </header>
       <ol class="cv">
@@ -317,12 +273,10 @@ const turnIcon = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13.2 8.2
     </section>
 
     <section id="contacto" class="contact" aria-labelledby="con-t">
-      <header class="sec-head" style="padding-left:0;padding-right:0">
-        <div>
-          <p class="kicker">04 · {contacto.lugar}</p>
-          <h2 id="con-t">Escríbeme</h2>
-        </div>
-        <p class="sec-note">El correo es el camino corto. También dejo GitHub, LinkedIn y el CV.</p>
+      <header class="sec-head is-contact">
+        <p class="kicker">{contacto.lugar}</p>
+        <h2 id="con-t">Escríbeme</h2>
+        <p class="sec-note">Si quieres ver cómo está montado un proyecto, escríbeme.</p>
       </header>
       <a class="email-xl" href={`mailto:${contacto.email}`}>{contacto.email}</a>
       <div class="contact-actions">

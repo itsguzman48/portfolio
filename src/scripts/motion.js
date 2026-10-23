@@ -106,7 +106,7 @@ export function start() {
         return;
       }
       const p = Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh));
-      plate.style.transform = `scale(${(1 - p * 0.075).toFixed(4)})`;
+      plate.style.transform = `scale(${(1 - p * 0.1).toFixed(4)})`;
       plate.style.setProperty('--stack', p.toFixed(4));
     });
 
