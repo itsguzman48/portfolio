@@ -94,19 +94,30 @@ export function start() {
     });
   }
 
-  const driftFallback = !reduce() && !CSS.supports('animation-timeline', 'scroll()');
   const track = document.querySelector('.hero-track');
   const rail = [...document.querySelectorAll('.rail a')];
-  const mast = document.querySelector('.mast');
-  const stage = document.querySelector('.stage');
+  const flow = document.querySelector('.flow');
 
   const layout = () => {
     const vh = window.innerHeight || 1;
+    const vw = window.innerWidth || 1;
     const calm = reduce();
-    if (mast && stage) {
-      const bar = document.querySelector('.bar');
-      const limit = (bar ? bar.getBoundingClientRect().height : 54) + 1;
-      mast.classList.toggle('is-covered', stage.getBoundingClientRect().top <= limit);
+    // Medido en cydstumpel.nl: en los primeros 50vh el nombre se desplaza
+    // hasta -40vw con ease-out quart (1 - (1-p)^4). A 176px ya va por -497px
+    // y se queda en -576px (-40vw a 1440). Bajar mueve a la izquierda; subir, a la derecha.
+    if (track) {
+      if (calm) {
+        track.style.transform = '';
+      } else {
+        const p = Math.min(1, Math.max(0, window.scrollY / (vh * 0.5)));
+        const eased = 1 - (1 - p) ** 4;
+        track.style.transform = `translate3d(${(-0.4 * vw * eased).toFixed(2)}px, 0, 0)`;
+      }
+    }
+    if (flow) {
+      const windowPx = parseFloat(getComputedStyle(root).getPropertyValue('--window')) || 100;
+      const cut = Math.max(0, windowPx - flow.getBoundingClientRect().top);
+      flow.style.clipPath = cut > 0.5 ? `inset(${cut.toFixed(2)}px 0 0 0)` : '';
     }
     sheets.forEach((sheet, index) => {
       const plate = sheet.querySelector('.plate');
@@ -121,12 +132,6 @@ export function start() {
       plate.style.transform = `scale(${(1 - raw * 0.08).toFixed(4)})`;
       plate.style.setProperty('--stack', raw.toFixed(4));
     });
-
-    if (driftFallback && track) {
-      const p = Math.min(1, Math.max(0, window.scrollY / (vh * 0.7)));
-      const eased = 1 - (1 - p) ** 3;
-      track.style.transform = `translateX(${(-22 * eased).toFixed(2)}vw)`;
-    }
 
     const stack = document.querySelector('.stack');
     if (stack) {

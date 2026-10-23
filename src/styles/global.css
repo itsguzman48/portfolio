@@ -18,6 +18,8 @@
   --ease: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
   --hdr: 54px;
+  /* Franja fija sobre la barra: el remate de las letras sigue visible. */
+  --window: 100px;
   --mast: clamp(156px, 19.2vw, 292px);
   --pad: clamp(20px, 3.2vw, 48px);
 }
@@ -59,11 +61,15 @@ a { color: inherit; }
   height: var(--mast);
   overflow: hidden;
   display: flex;
-  align-items: center;
-  padding-top: 6px;
-  transform-origin: center top;
+  align-items: flex-start;
+  padding-top: 2px;
+  background: transparent;
+  pointer-events: none;
 }
-.mast.is-covered { visibility: hidden; }
+.flow {
+  position: relative; z-index: 1;
+  background: transparent;
+}
 .hero-track {
   display: flex; align-items: baseline; width: max-content;
   gap: 0.12em; margin-left: -0.22em;
@@ -75,7 +81,7 @@ a { color: inherit; }
 }
 
 .bar {
-  position: sticky; top: 0; z-index: 40; height: var(--hdr);
+  position: sticky; top: var(--window); z-index: 40; height: var(--hdr);
   display: flex; align-items: center; gap: clamp(14px, 2vw, 28px);
   padding: 0 var(--pad); background: var(--paper);
   border-top: 2px solid var(--coral);
@@ -228,8 +234,11 @@ a { color: inherit; }
 .stack { position: relative; }
 .sheet { position: relative; }
 .js .sheet {
-  position: sticky; top: 0; height: 100svh; z-index: var(--z);
-  padding: calc(var(--hdr) + 16px) clamp(16px, 2.6vw, 40px) 20px;
+  position: sticky; top: calc(var(--window) + var(--hdr));
+  height: calc(100svh - var(--window) - var(--hdr));
+  z-index: var(--z);
+  padding: 12px clamp(16px, 2.6vw, 40px) 16px;
+  background: var(--paper);
 }
 #proyectos, #oficio, #recorrido, #contacto { scroll-margin-top: 12px; }
 .js .plate { height: 100%; transform-origin: center top; }
@@ -371,7 +380,8 @@ a { color: inherit; }
   min-height: 44px; display: inline-flex; align-items: center;
 }
 .lang { margin: 28px 0 0; color: var(--muted); max-width: 46ch; font-size: 16px; }
-.colophon { padding: 28px var(--pad) 36px; }
+.colophon { padding: 28px var(--pad) 36px; background: var(--paper); position: relative; }
+main { background: var(--paper); position: relative; }
 .colo-name {
   margin: 0; font-family: var(--display); font-weight: 800; text-transform: uppercase;
   font-size: clamp(72px, 15vw, 210px); line-height: 1; letter-spacing: -0.035em;
@@ -405,21 +415,12 @@ a { color: inherit; }
   .js.is-ready .rise-title {
     transition: opacity 0.8s var(--ease-back) 0.3s, transform 0.8s var(--ease-back) 0.3s;
   }
-  .hero-track {
-    animation: name-drift cubic-bezier(0.25, 1, 0.5, 1) both;
-    animation-timeline: scroll(root);
-    animation-range: 0 42vh;
-  }
   .mq-track { animation: ticker linear infinite; animation-duration: var(--mq, 20s); }
   .mq:hover .mq-track, .mq:focus-within .mq-track, .tile:hover .mq-track, .mq-paused .mq-track { animation-play-state: paused; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js .flip-inner, .turn svg { transition: none; }
-}
-@keyframes name-drift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-18vw); }
 }
 @keyframes ticker {
   from { transform: translateX(0); }
@@ -438,7 +439,7 @@ a { color: inherit; }
   .js .face-front { grid-template-columns: minmax(0, 1fr) minmax(180px, 0.9fr); }
 }
 @media (max-width: 800px) {
-  :root { --hdr: 52px; --mast: 148px; --pad: 16px; }
+  :root { --hdr: 52px; --mast: 148px; --pad: 16px; --window: 56px; }
   body { font-size: 16.5px; }
   .hero-track { font-size: 28vw; margin-left: -0.28em; }
   .bar-nav, .avail, .rail { display: none; }
@@ -462,7 +463,11 @@ a { color: inherit; }
   .stk-soc, .stk-a11y { width: 74px; height: 74px; font-size: 12px; }
   .stk-med, .stk-mod, .stk-mot { font-size: 13px; padding: 8px 10px; }
   .stk:hover { transform: none; }
-  .js .sheet { padding: calc(var(--hdr) + 10px) 10px 10px; }
+  .js .sheet {
+    top: calc(var(--window) + var(--hdr));
+    height: calc(100svh - var(--window) - var(--hdr));
+    padding: 10px 10px 10px;
+  }
   .js .face-front { display: flex; flex-direction: column; }
   .js .shot-main { order: -1; width: auto; height: 220px; margin: 12px 12px 0; flex: none; }
   .js .face-copy { flex: 1; }
