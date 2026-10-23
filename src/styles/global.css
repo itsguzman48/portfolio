@@ -23,6 +23,7 @@
 html { scroll-behavior: smooth; scroll-padding-top: 12px; }
 body {
   margin: 0;
+  padding-top: var(--hdr);
   background: var(--paper);
   color: var(--ink);
   font: 400 17px/1.5 var(--serif);
@@ -31,6 +32,7 @@ body {
   overflow-x: clip;
 }
 img { max-width: 100%; height: auto; }
+figure { margin: 0; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 a { color: inherit; }
@@ -84,11 +86,13 @@ a { color: inherit; }
   padding: 10px 0 28px;
 }
 .hero-clip { overflow: clip; padding: 0 var(--pad); }
-.hero-track { display: flex; align-items: baseline; gap: 0.55em; width: max-content; }
+.hero-track {
+  display: flex; align-items: baseline; width: max-content;
+  gap: 0.42em; font-size: clamp(64px, 13.2vw, 188px);
+}
 .hero-track h1, .hero-track span {
-  margin: 0; font-family: var(--display); font-weight: 800;
-  font-size: clamp(64px, 13.2vw, 188px); line-height: 0.84;
-  letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap;
+  margin: 0; font-family: var(--display); font-weight: 800; font-size: 1em;
+  line-height: 0.84; letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap;
 }
 .hero-grid {
   margin-top: auto;
@@ -148,8 +152,9 @@ a { color: inherit; }
 .sheet { position: relative; background: transparent; }
 .js .sheet {
   position: sticky; top: 0; height: 100svh; z-index: var(--z);
-  padding: calc(var(--hdr) + 12px) 18px 16px;
+  padding: calc(var(--hdr) + 12px) 72px 16px 18px;
 }
+#proyectos, #oficio, #recorrido, #contacto { scroll-margin-top: calc(var(--hdr) + 8px); }
 .js .plate { height: 100%; transform-origin: center 8%; }
 .plate {
   --stack: 0;
@@ -189,11 +194,12 @@ a { color: inherit; }
 .meta { margin: 0; font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; text-align: right; }
 .face-title {
   margin: 0; font-family: var(--display); font-weight: 800;
-  font-size: clamp(52px, 6.2vw, 104px); line-height: 0.84; letter-spacing: -0.02em;
+  font-size: clamp(56px, 7.2vw, 118px); line-height: 0.84; letter-spacing: -0.02em;
   text-transform: uppercase; text-wrap: balance;
 }
 .line { margin: 0; max-width: 36ch; font-size: clamp(16px, 1.3vw, 18px); }
-.face-copy .turn { margin-top: auto; align-self: flex-start; }
+.face-copy .line { margin-top: auto; }
+.face-copy .turn { margin-top: 16px; align-self: flex-start; }
 .turn {
   display: none; align-items: center; gap: 8px;
   border-bottom: 1px solid currentColor; padding-bottom: 3px;
@@ -237,7 +243,8 @@ a { color: inherit; }
 }
 .rail a {
   font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: 0.08em;
-  text-decoration: none; padding: 5px 4px; opacity: 0.38;
+  text-decoration: none; padding: 5px 2px; color: var(--ink); opacity: 0.4;
+  background: var(--paper);
 }
 .rail a[aria-current='true'] { opacity: 1; }
 .is-in-work .rail { opacity: 1; pointer-events: auto; }
@@ -252,6 +259,10 @@ a { color: inherit; }
 .tile .face { background: var(--paper); color: var(--ink); border: 1px solid var(--ink); border-radius: 0; }
 .tile .face-back { background: var(--ink); color: var(--paper); }
 .tile .face-front, .tile .face-back { padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.js .tile .face-front, .js .tile .face-back {
+  display: flex; flex-direction: column; grid-template-columns: unset;
+  padding: 18px 18px 20px; gap: 12px;
+}
 .mq { overflow: clip; margin: 0 -18px; }
 .mq-track { display: flex; width: max-content; }
 .mq-track span {
@@ -328,9 +339,12 @@ a { color: inherit; }
     opacity: 1; transform: none;
     transition: opacity var(--dur, 1s) var(--ease) var(--delay, 0.1s), transform var(--dur, 1s) var(--ease) var(--delay, 0.1s);
   }
-  .rise-title { --from: 36px; --dur: 0.8s; --delay: 0.3s; --ease: var(--ease-back); }
+  .rise-title { --from: 36px; --dur: 0.8s; --delay: 0.3s; }
+  .js.is-ready .rise-title {
+    transition: opacity 0.8s var(--ease-back) 0.3s, transform 0.8s var(--ease-back) 0.3s;
+  }
   .hero-track {
-    animation: name-drift var(--ease) both;
+    animation: name-drift cubic-bezier(0.25, 1, 0.5, 1) both;
     animation-timeline: scroll(root);
     animation-range: 0 70vh;
   }
@@ -369,13 +383,15 @@ a { color: inherit; }
   .brand-short, .hdr-menu { display: inline; }
   .hdr-menu { display: inline-flex; }
   .hero { min-height: 0; }
+  .hero-track { font-size: clamp(64px, 16.4vw, 92px); }
   .hero-grid { grid-template-columns: 1fr; margin-top: 22px; }
   .hero-side { grid-column: auto; grid-template-columns: 1fr; }
   .hero-photo { max-width: 220px; }
   .js .sheet { padding: calc(var(--hdr) + 8px) 8px 8px; }
-  .js .face-front { grid-template-columns: 1fr; grid-template-rows: 200px minmax(0, 1fr); }
-  .js .shot-main { grid-column: 1; grid-row: 1; height: 200px; }
-  .face-title { font-size: 54px; }
+  .js .face-front { display: flex; flex-direction: column; min-width: 0; max-width: 100%; }
+  .js .shot-main { order: -1; width: 100%; max-width: 100%; height: 210px; flex: none; }
+  .js .face-copy { flex: 1; min-height: 0; }
+  .face-title { font-size: 58px; }
   .js .face-back { grid-template-columns: 1fr; }
   .sec-head { flex-direction: column; align-items: flex-start; }
   .sec-head h2 { max-width: none; }
