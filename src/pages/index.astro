@@ -8,13 +8,11 @@ import { Image } from 'astro:assets';
 import Toc from '../components/Toc.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import Chapter from '../components/Chapter.astro';
-import { contacto, proyectos, experiencia, formacion, herramientas, idiomas } from '../data.js';
-import mapa_ataques from '../assets/mapa_ataques.png';
-import arquitectura_haizelab from '../assets/arquitectura_haizelab.png';
-import shap_summary_beeswarm from '../assets/shap_summary_beeswarm.png';
-import celestial from '../assets/celestial.png';
-import luxai from '../assets/luxai.png';
-const imgs = { mapa_ataques, arquitectura_haizelab, shap_summary_beeswarm, celestial };
+import { contacto, proyectos, luxai as lux, experiencia, formacion, herramientas, idiomas } from '../data.js';
+import retrato from '../assets/retrato.jpg';
+const files = import.meta.glob<{ default: ImageMetadata }>('../assets/*.{png,jpg}', { eager: true });
+const imgs = Object.fromEntries(Object.entries(files).map(([k, v]) => [k.split('/').pop()!.replace(/\.\w+$/, ''), v.default]));
+const laminas = [...proyectos.map((p) => ({ ...p, img: p.laminas[0].img, alt: p.laminas[0].alt })), { ...lux, alt: 'Portada de luxaivideo.com.' }];
 const desc = 'Íñigo Guzmán. Técnico Superior ASIR especializándose en IA y Big Data. Sistemas, cloud, pipelines de datos e IA aplicada a infraestructura real. Getxo, Bizkaia.';
 ---
 <html lang="es">
@@ -36,73 +34,110 @@ const desc = 'Íñigo Guzmán. Técnico Superior ASIR especializándose en IA y 
   <a class="skip" href="#contenido">Saltar al contenido</a>
 
   <header class="cover">
-    <p class="folio" aria-hidden="true">·</p>
-    <h1 class="name"><span>Íñigo</span><span>Guzmán</span></h1>
-    <p class="subtitle">Sistemas, cloud, datos <em>&amp;</em> IA</p>
-    <p class="lede">Vengo de administrar servidores y ahora me estoy especializando en IA y Big Data. Lo que me interesa es la parte que suele quedarse fuera de las demos: llevar los modelos y los datos a una infraestructura que funcione de verdad.</p>
-    <Toc />
-    <div class="edition">
-      <span>ed. MMXXVI · {contacto.lugar}</span>
-      <ThemeToggle />
+    <figure class="frontis">
+      <div class="frontis-frame">
+        <Image src={retrato} alt="Retrato de Íñigo Guzmán, sonriendo, junto a un río de agua turquesa." widths={[220, 352]} sizes="(max-width: 64rem) 11rem, 16rem" loading="eager" />
+      </div>
+      <figcaption>El autor</figcaption>
+    </figure>
+    <div class="cover-text">
+      <p class="folio" aria-hidden="true">ed. MMXXVI</p>
+      <h1 class="name"><span>Íñigo</span><span>Guzmán</span></h1>
+      <p class="subtitle">Sistemas, cloud, datos <em>&amp;</em> IA</p>
+      <p class="lede">Vengo de administrar servidores y ahora me especializo en IA y Big Data en el CIFP Somorrostro. Me interesa la parte que suele quedarse fuera de las demos: llevar los modelos y los datos a una infraestructura que funcione de verdad.</p>
+      <p class="cover-links">
+        <a href={`mailto:${contacto.email}`}>Email</a>
+        <a href={contacto.github} target="_blank" rel="noopener">GitHub</a>
+        <a href={contacto.linkedin} target="_blank" rel="noopener">LinkedIn</a>
+        <a href="/cv.pdf" download="CV-Inigo-Guzman.pdf">CV en PDF ↓</a>
+        <ThemeToggle />
+      </p>
     </div>
   </header>
 
+  <section class="laminas" aria-labelledby="laminas-h">
+    <div class="laminas-head">
+      <h2 id="laminas-h">Índice de láminas</h2>
+      <span>Cinco trabajos · {contacto.lugar}</span>
+    </div>
+    <ol class="lam-grid">
+      {laminas.map((l, i) => (
+        <li class={`lam lam-${l.id}`}>
+          <a href={`#${l.id}`}>
+            <span class="lam-img"><Image src={imgs[l.img]} alt="" widths={[480, 720, 960]} sizes="(max-width: 40rem) 40vw, (max-width: 64rem) 46vw, 30rem" loading={i < 3 ? 'eager' : 'lazy'} /></span>
+            <span class="lam-cap"><span class="lam-t">{l.titulo}</span><span class="lam-n">Lám. {l.n}</span></span>
+            <span class="lam-line">{l.linea}</span>
+            <span class="lam-stack">{l.corto}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </section>
+
   <div class="running" aria-hidden="true" data-running>
     <a href="#" tabindex="-1">Íñigo Guzmán</a>
-    <span data-running-ch></span>
+    <span data-running-ch>Índice de láminas</span>
   </div>
 
   <main id="contenido">
     <Chapter id="sobre-mi" n="I" title="Sobre mí">
       <div class="prose">
-        <p class="dropcap">Soy técnico superior en Administración de Sistemas Informáticos en Red por el CIFP Somorrostro, y este curso hago allí la especialización en Inteligencia Artificial y Big Data. Mi base es la de un sysadmin: Linux, Windows Server, redes, scripting.</p>
-        <p>En 2026 pasé tres meses de Erasmus en Cosenza, en Italia, como técnico de sistemas en Internet-Idee, entre servidores, máquinas virtuales y soporte. Antes, en 2020, estuve al teléfono en atención técnica para Vodafone, que es donde se aprende a resolver una incidencia con alguien nervioso al otro lado.</p>
+        <p class="dropcap">Soy técnico superior en Administración de Sistemas Informáticos en Red, y este curso hago la especialización en Inteligencia Artificial y Big Data. Mi base es la de un sysadmin: Linux, Windows Server, redes, scripting. En 2026 pasé tres meses de Erasmus en Cosenza, en Italia, como técnico de sistemas en Internet-Idee.</p>
         <p>Casi todo lo que hago acaba teniendo la misma forma: algo que recoge datos, algo que los guarda bien, un modelo que saca una conclusión y un panel donde alguien la puede leer. Me gusta que las cifras sean honestas, aunque salgan menos espectaculares.</p>
         <p>Fuera de la pantalla edito vídeo y vuelo dron. Tengo carné B, coche propio y ganas de moverme.</p>
       </div>
-      <figure class="pull">
-        <blockquote><p>“La conclusión es un efecto confirmado pero moderado: algo más de la mitad de la bajada observada en el centro se habría producido igualmente.”</p></blockquote>
-        <figcaption>— Del informe de HaizeLab</figcaption>
-      </figure>
     </Chapter>
 
     <Chapter id="proyectos" n="II" title="Proyectos">
       <p class="intro">Cuatro trabajos de 2026, de la red a la estadística. Todos tienen el código abierto en GitHub.</p>
       <ol class="works">
-        {proyectos.map((p, i) => (
+        {proyectos.map((p) => (
           <li class="work" id={p.id}>
-            <a class="plate" href={p.enlaces[0].u} target="_blank" rel="noopener" aria-label={`${p.titulo}: ${p.enlaces[0].t}`}>
-              <Image src={imgs[p.img]} alt={p.alt} widths={[640, 960, 1280]} sizes="(max-width: 760px) 92vw, 720px" loading={i === 0 ? 'eager' : 'lazy'} />
-            </a>
-            <div class="caption">
-              <h3>{p.titulo}</h3>
-              <span>{p.meta}</span>
+            <div class={`gallery ${p.movil ? 'gallery-movil' : ''}`}>
+              {p.laminas.map((l, j) => (
+                <figure class={j === 0 ? 'g-main' : 'g-sub'}>
+                  <span class="plate"><Image src={imgs[l.img]} alt={l.alt} widths={j === 0 && !p.movil ? [720, 1080, 1600] : [400, 640, 900]} sizes={j === 0 ? '(max-width: 64rem) 94vw, 56rem' : '(max-width: 40rem) 46vw, 28rem'} /></span>
+                  <figcaption><span>{p.n}{String.fromCharCode(97 + j)}</span> {l.pie}</figcaption>
+                </figure>
+              ))}
             </div>
-            <p class="figure"><strong>{p.cifra}</strong> <span>{p.cifraTexto}</span></p>
-            <p class="work-text">{p.texto}</p>
-            <p class="stack"><em>{p.stack}</em></p>
-            <p class="links">{p.enlaces.map((e) => <a href={e.u} target="_blank" rel="noopener">{e.t} ↗</a>)}</p>
+            <div class="work-body">
+              <div class="work-main">
+                <div class="caption"><h3>{p.titulo}</h3><span>Lám. {p.n}</span></div>
+                <p class="figure"><strong>{p.cifra}</strong> <span>{p.cifraTexto}</span></p>
+                {p.texto.map((t) => <p class="work-text">{t}</p>)}
+                {p.cita && <blockquote class="cita"><p>“{p.cita}”</p><footer>— Del informe de HaizeLab</footer></blockquote>}
+              </div>
+              <dl class="ficha">
+                <div><dt>Contexto</dt><dd>{p.meta}</dd></div>
+                <div><dt>Con</dt><dd><em>{p.stack}</em></dd></div>
+                <div><dt>Ver</dt><dd class="links">{p.enlaces.map((e) => <a href={e.u} target="_blank" rel="noopener">{e.t} ↗</a>)}</dd></div>
+              </dl>
+            </div>
           </li>
         ))}
       </ol>
     </Chapter>
 
     <Chapter id="luxai" n="III" title="LUXAI">
-      <p class="intro">Mi proyecto emprendedor. Va de otra cosa, pero con las mismas manías.</p>
-      <a class="plate plate-wide" href="https://luxaivideo.com" target="_blank" rel="noopener" aria-label="Visitar luxaivideo.com">
-        <Image src={luxai} alt="Portada de luxaivideo.com: una villa al atardecer con el titular «Vuestras fotos ya tienen una película dentro»." widths={[640, 960, 1440]} sizes="(max-width: 860px) 94vw, 820px" />
-      </a>
-      <div class="caption"><h3>LUXAI Video</h3><a href="https://luxaivideo.com" target="_blank" rel="noopener">luxaivideo.com ↗</a></div>
-      <div class="prose">
-        <p>LUXAI convierte las fotos de villas y alquileres de lujo en vídeos de estilo aéreo, como grabados con dron, pero generados con IA (Google Flow). Sin rodaje, sin dron y sin permisos de vuelo: el cliente manda entre 5 y 15 fotos y en 72 horas tiene sus vídeos para portales, web y redes.</p>
-        <p>La web también es mía: multipágina, en español e inglés, hecha con Astro y TypeScript, con su auditoría de SEO, informes de Lighthouse y un documento donde apunto cada decisión de diseño con su motivo.</p>
+      <p class="intro">Proyecto propio.</p>
+      <div class="gallery gallery-movil">
+        <figure class="g-main"><a class="plate" href="https://luxaivideo.com" target="_blank" rel="noopener"><Image src={imgs.luxai} alt="Portada de luxaivideo.com: una villa al atardecer con el titular «Vuestras fotos ya tienen una película dentro»." widths={[720, 1080, 1440]} sizes="(max-width: 64rem) 94vw, 42rem" /></a><figcaption><span>5a</span> luxaivideo.com, en escritorio</figcaption></figure>
+        <figure class="g-sub"><a class="plate" href="https://luxaivideo.com" target="_blank" rel="noopener" tabindex="-1"><Image src={imgs.luxai_movil} alt="La misma portada en un móvil." widths={[400, 640]} sizes="14rem" /></a><figcaption><span>5b</span> Y en el móvil</figcaption></figure>
       </div>
-      <dl class="facts">
-        <div><dt>De las fotos al vídeo</dt><dd>72 h</dd></div>
-        <div><dt>Fotos de partida</dt><dd>5–15</dd></div>
-        <div><dt>Formatos</dt><dd>16:9 · 9:16</dd></div>
-        <div><dt>Web</dt><dd>Astro + TS, ES/EN</dd></div>
-      </dl>
+      <div class="work-body">
+        <div class="work-main">
+          <div class="caption"><h3>LUXAI Video</h3><a href="https://luxaivideo.com" target="_blank" rel="noopener">luxaivideo.com ↗</a></div>
+          <p class="work-text">LUXAI convierte las fotos de villas y alquileres de lujo en vídeos de estilo aéreo, como grabados con dron, pero generados con IA (Google Flow). Sin rodaje ni permisos de vuelo: el cliente manda entre 5 y 15 fotos y en 72 horas tiene sus vídeos para portales, web y redes.</p>
+          <p class="work-text">La web también es mía: multipágina, en español e inglés, con Astro y TypeScript.</p>
+        </div>
+        <dl class="ficha">
+          <div><dt>De las fotos al vídeo</dt><dd>72 h</dd></div>
+          <div><dt>Fotos de partida</dt><dd>5–15</dd></div>
+          <div><dt>Formatos</dt><dd>16:9 · 9:16</dd></div>
+          <div><dt>Ver</dt><dd class="links"><a href="https://luxaivideo.com" target="_blank" rel="noopener">La web ↗</a><a href="https://github.com/itsguzman48/luxaivideo-web" target="_blank" rel="noopener">Repositorio ↗</a></dd></div>
+        </dl>
+      </div>
     </Chapter>
 
     <Chapter id="trayectoria" n="IV" title="Trayectoria">
@@ -184,7 +219,7 @@ const desc = 'Íñigo Guzmán. Técnico Superior ASIR especializándose en IA y 
     }
     if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
       const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
-      document.querySelectorAll('.chapter, .work').forEach((el) => { el.classList.add('rise'); io.observe(el); });
+      document.querySelectorAll('.chapter, .work, .laminas').forEach((el) => { el.classList.add('rise'); io.observe(el); });
     }
   </script>
 </body>
