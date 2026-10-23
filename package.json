@@ -12,9 +12,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@fontsource-variable/eb-garamond": "^5.3.0",
-    "@fontsource/im-fell-english": "^5.3.0",
-    "@fontsource/im-fell-english-sc": "^5.3.0",
-    "astro": "^7.4.2"
+    "@fontsource-variable/sora": "^5.3.0",
+    "@fontsource/gloock": "^5.3.0",
+    "astro": "^7.4.2",
+    "ogl": "^1.0.11"
   }
 }
